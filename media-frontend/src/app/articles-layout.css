@@ -1,0 +1,54 @@
+/* Articles + Sidebar Layout */
+
+.articles-layout {
+  display: block;
+  margin-bottom: 2rem;
+}
+
+.articles-main {
+  flex: 1;
+}
+
+.articles-sidebar {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .articles-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .articles-sidebar {
+    order: -1; /* Show sidebar first on tablet */
+  }
+}
+
+@media (max-width: 768px) {
+  .articles-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .articles-sidebar {
+    order: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .articles-layout {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .articles-main {
+    width: 100%;
+  }
+
+  .articles-sidebar {
+    width: 100%;
+  }
+}

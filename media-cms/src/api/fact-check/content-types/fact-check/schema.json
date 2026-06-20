@@ -1,0 +1,56 @@
+{
+  "kind": "collectionType",
+  "collectionName": "fact_checks",
+  "info": {
+    "singularName": "fact-check",
+    "pluralName": "fact-checks",
+    "displayName": "Fact Check",
+    "description": "Claims verified by the editorial team with detailed analysis"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "claim": {
+      "type": "string",
+      "required": true
+    },
+    "verdict": {
+      "type": "enumeration",
+      "enum": ["verified", "disputed", "false"],
+      "default": "disputed"
+    },
+    "source": {
+      "type": "string",
+      "required": false
+    },
+    "body": {
+      "type": "richtext",
+      "maxLength": 5000,
+      "required": false
+    },
+    "media": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images", "files", "videos"]
+    },
+    "note": {
+      "type": "text",
+      "required": false
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "breaking": {
+      "type": "boolean",
+      "default": false
+    },
+    "urgent": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

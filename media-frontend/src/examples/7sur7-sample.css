@@ -1,0 +1,70 @@
+:root{
+  --brand:#0A2540;
+  --bg:#fff;
+  --fg:#111827;
+  --muted:#6b7280;
+}
+*{box-sizing:border-box}
+body{font-family:Inter,system-ui,Arial,sans-serif;margin:0;background:var(--bg);color:var(--fg)}
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+/* Header */
+.site-header{border-bottom:1px solid #e5e7eb;background:#fff}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{font-weight:900;color:var(--brand);font-size:22px}
+.top-links a{margin-left:18px;color:var(--muted);text-decoration:none;font-weight:700}
+/* Category nav */
+.category-nav{background:#fff;padding:8px 0;border-top:1px solid #f3f4f6}
+.category-nav .container{display:flex;gap:16px;overflow:auto}
+.category-nav a{color:#111;font-weight:700;text-transform:uppercase;font-size:13px;text-decoration:none;padding:6px 8px}
+.category-nav a:hover{color:var(--brand)}
+/* Main grid */
+.main-grid{padding:20px 0}
+.hero-figure{position:relative;border-radius:6px;overflow:hidden}
+.hero-figure img{width:100%;height:360px;object-fit:cover;display:block}
+.hero-figure figcaption{position:absolute;left:24px;bottom:24px;color:#fff}
+.badge{background:var(--brand);padding:6px 10px;font-weight:900;border-radius:3px;font-size:12px}
+.hero-figure h1{font-size:32px;margin:10px 0 6px;line-height:1.05}
+.lead{max-width:720px;color:rgba(255,255,255,0.9)}
+/* Content layout */
+.content{display:grid;grid-template-columns:2fr 1fr;gap:28px;margin-top:22px}
+.news-list{display:flex;flex-direction:column;gap:18px}
+.news-item{display:flex;gap:14px;align-items:flex-start;padding-bottom:12px;border-bottom:1px solid #eee}
+.thumb{width:128px;height:86px;flex-shrink:0;border-radius:4px;overflow:hidden;background:#f3f4f6}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.meta .cat{display:inline-block;background:var(--brand);color:#fff;padding:4px 8px;font-weight:900;font-size:12px;border-radius:3px}
+.meta .title{font-size:18px;margin:6px 0 4px;font-weight:800}
+.meta .excerpt{color:#6b7280;margin:0}
+/* Sidebar */
+.sidebar{background:#fff;padding:14px;border-radius:6px;border:1px solid #f3f4f6}
+.follow-list{list-style:none;padding:0;margin:0}
+.follow-list li{margin-bottom:10px}
+.num{color:var(--brand);font-weight:900;margin-right:8px}
+/* Footer */
+.site-footer{border-top:1px solid #e5e7eb;margin-top:40px;padding:26px 0;background:#f9fafb}
+.footer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.site-footer h4{margin:0 0 8px;font-weight:900}
+.site-footer p, .site-footer a{color:#6b7280}
+@media(max-width:900px){.content{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.logo{font-size:20px}.hero-figure img{height:220px}}
+
+/* --- Articles Page Styles --- */
+.articles-section{padding:30px 0}
+.section-title{font-size:28px;font-weight:900;margin:0 0 24px;border-bottom:3px solid var(--brand);padding-bottom:12px}
+
+.articles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:40px}
+.article-card-grid{background:#fff;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;transition:box-shadow 0.2s,transform 0.2s}
+.article-card-grid:hover{box-shadow:0 4px 12px rgba(0,0,0,0.1);transform:translateY(-2px)}
+
+.article-image{position:relative;width:100%;height:180px;margin:0;overflow:hidden;background:#f3f4f6}
+.article-image img{width:100%;height:100%;object-fit:cover}
+.article-category{position:absolute;bottom:8px;left:8px;background:var(--brand);color:#fff;padding:4px 8px;font-weight:900;font-size:11px;border-radius:3px;margin:0}
+
+.article-body{padding:16px}
+.article-body h2{font-size:16px;font-weight:800;margin:0 0 8px;line-height:1.3;color:#000}
+.article-body p{margin:0 0 12px;font-size:13px;color:#666;line-height:1.4}
+
+.article-meta{display:flex;justify-content:space-between;font-size:12px;color:#999;gap:8px}
+.article-meta .author{font-weight:600}
+.article-meta .date{color:#aaa}
+
+@media(max-width:1200px){.articles-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.articles-grid{grid-template-columns:1fr}.section-title{font-size:22px}.article-image{height:220px}}

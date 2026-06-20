@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Article détaillé - Actu 24</title>
+  <link rel="stylesheet" href="7sur7-sample.css">
+  <style>
+    /* Additional styles for article detail page */
+    .article-detail {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 16px;
+    }
+    
+    .article-hero {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      margin-bottom: 30px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f3f4f6;
+    }
+    
+    .article-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .article-hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 30px;
+      color: #fff;
+    }
+    
+    .article-category-badge {
+      display: inline-block;
+      background: var(--brand);
+      padding: 6px 12px;
+      font-weight: 900;
+      font-size: 12px;
+      border-radius: 3px;
+      width: fit-content;
+      margin-bottom: 12px;
+    }
+    
+    .article-detail h1 {
+      font-size: 36px;
+      font-weight: 900;
+      margin: 0 0 16px;
+      line-height: 1.1;
+    }
+    
+    .article-detail-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .author-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .author-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #f3f4f6;
+    }
+    
+    .author-info h4 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 14px;
+      color: #000;
+    }
+    
+    .author-info p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .article-content {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #333;
+      margin-bottom: 40px;
+    }
+    
+    .article-content p {
+      margin: 0 0 20px;
+    }
+    
+    .article-content p:first-letter {
+      font-weight: 900;
+      font-size: 1.1em;
+    }
+    
+    .article-content h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 30px 0 16px;
+      color: #000;
+    }
+    
+    .article-content blockquote {
+      border-left: 4px solid var(--brand);
+      padding-left: 16px;
+      margin: 24px 0;
+      font-style: italic;
+      color: #666;
+    }
+    
+    .related-articles {
+      border-top: 2px solid var(--brand);
+      padding-top: 30px;
+      margin-top: 40px;
+    }
+    
+    .related-articles h3 {
+      font-size: 20px;
+      font-weight: 900;
+      margin: 0 0 20px;
+    }
+    
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    .related-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.2s;
+    }
+    
+    .related-item:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .related-image {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: #f3f4f6;
+    }
+    
+    .related-body {
+      padding: 12px;
+    }
+    
+    .related-body h4 {
+      font-size: 13px;
+      font-weight: 800;
+      margin: 0 0 6px;
+      line-height: 1.2;
+    }
+    
+    @media (max-width: 768px) {
+      .article-detail h1 {
+        font-size: 24px;
+      }
+      .article-hero {
+        height: 240px;
+      }
+      .article-detail-meta {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .related-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">Actu 24</div>
+      <nav class="top-links">
+        <a href="#">Accueil</a>
+        <a href="#">Articles</a>
+        <a href="#">À propos</a>
+      </nav>
+    </div>
+    <nav class="category-nav">
+      <div class="container">
+        <a href="#">Politique</a>
+        <a href="#">Une</a>
+        <a href="#">Economie</a>
+        <a href="#">Sport</a>
+        <a href="#">Santé</a>
+        <a href="#">Société</a>
+        <a href="#">Culture</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="article-detail">
+    <!-- Hero Image -->
+    <section class="article-hero">
+      <img src="/uploads/article-hero.jpg" alt="Article" />
+      <div class="article-hero-overlay">
+        <span class="article-category-badge">Politique</span>
+        <h1>Négociations à Doha : la RDC et le M23 au cœur de nouvelles discussions diplomatiques</h1>
+      </div>
+    </section>
+
+    <!-- Metadata -->
+    <div class="article-detail-meta">
+      <div class="author-card">
+        <img src="/uploads/author-avatar.jpg" alt="Auteur" class="author-avatar" />
+        <div class="author-info">
+          <h4>Jean-Paul Kasongo</h4>
+          <p>3 février 2026 à 14h32</p>
+        </div>
+      </div>
+      <div style="margin-left: auto;">
+        <span style="font-size: 12px; color: #999;">Lecture: ~5 min</span>
+      </div>
+    </div>
+
+    <!-- Article Content -->
+    <article class="article-content">
+      <p>
+        Les négociations entre la République Démocratique du Congo et les groupes armés se sont intensifiées ce jour à Doha, avec l'implication directe des puissances régionales et internationales. Le contexte géopolitique complexe de la région demande une approche délicate et nuancée.
+      </p>
+
+      <h2>Un contexte délicate</h2>
+      <p>
+        La situation actuelle en République Démocratique du Congo reflète les tensions longue durée qui caractérisent la région des Grands Lacs. Les acteurs diplomatiques ont insisté sur l'importance de trouver une solution durable et inclusive.
+      </p>
+
+      <blockquote>
+        "La paix ne peut être imposée, elle doit être négociée entre tous les acteurs concernés", a déclaré le médiateur international lors de la conférence de presse.
+      </blockquote>
+
+      <p>
+        Les enjeux économiques et sécuritaires demeurent importants pour la stabilité régionale. Les discussions portent sur plusieurs aspects fondamentaux incluant le désarmement, la réintégration et les garanties de sécurité.
+      </p>
+
+      <h2>Les acteurs impliqués</h2>
+      <p>
+        Plusieurs pays riverains, ainsi que les Nations Unies, ont dépêché leurs représentants à Doha pour soutenir le processus. La communauté internationale reconnaît l'importance stratégique de cette région.
+      </p>
+
+      <p>
+        Les négociateurs travaillent sur un calendrier prévu pour les trois prochains mois, avec des points de contrôle réguliers et des évaluations de la bonne foi des parties. L'optimisme teinte les discussions, bien que de nombreux défis restent à surmonter.
+      </p>
+
+      <h2>Les prochaines étapes</h2>
+      <p>
+        Une nouvelle réunion de suivi est prévue dans deux semaines. Les parties s'engagent à respecter les cessez-le-feu convenus et à coopérer avec les observateurs de la communauté internationale.
+      </p>
+    </article>
+
+    <!-- Related Articles -->
+    <section class="related-articles">
+      <h3>Articles connexes</h3>
+      <div class="related-grid">
+        <a href="#" class="related-item">
+          <img src="/uploads/related1.jpg" alt="Article connexe" class="related-image" />
+          <div class="related-body">
+            <h4>La situation humanitaire s'aggrave dans l'Est du Congo</h4>
+          </div>
+        </a>
+
+        <a href="#" class="related-item">
+          <img src="/uploads/related2.jpg" alt="Article connexe" class="related-image" />
+          <div class="related-body">
+            <h4>Les sanctions économiques contre les groupes armés</h4>
+          </div>
+        </a>
+
+        <a href="#" class="related-item">
+          <img src="/uploads/related3.jpg" alt="Article connexe" class="related-image" />
+          <div class="related-body">
+            <h4>L'intervention de la MONUSCO critiquée par les ONG</h4>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Actu 24</h4>
+        <p>Votre source d'information fiable et quotidienne. Retrouvez les meilleures actualités.</p>
+      </div>
+      <div>
+        <h5>Navigation</h5>
+        <ul>
+          <li><a href="#">Accueil</a></li>
+          <li><a href="#">Articles</a></li>
+          <li><a href="#">À propos</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Légal</h5>
+        <ul>
+          <li><a href="#">Mentions légales</a></li>
+          <li><a href="#">Confidentialité</a></li>
+          <li><a href="#">Conditions d'utilisation</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <p>📧 contact@actu24.fr</p>
+        <p>📱 +33 (0) 1 XX XX XX XX</p>
+        <p class="social">Facebook • Twitter • LinkedIn</p>
+      </div>
+    </div>
+    <div class="container copyright">
+      © 2026 Actu 24. Tous droits réservés. | Powered by Strapi & Next.js
+    </div>
+  </footer>
+</body>
+</html>
