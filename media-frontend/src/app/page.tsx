@@ -82,15 +82,15 @@ export default async function Home() {
         </div>
       </main>
 
-      <section className="max-w-7xl mx-auto px-4 md:px-6 py-12">
+      <section className="factcheck-fullwidth py-12">
         <FactCheckPreview />
       </section>
 
       <section className="max-w-7xl mx-auto px-4 md:px-6 py-8">
-        <div className="border-b-2 border-black pb-2 mb-8">
+        <div className="mb-8">
           <h2 className="text-2xl font-black uppercase tracking-tight">Les Grands Titres du jour</h2>
         </div>
-        <div className="bg-gray-100 p-8 text-center text-gray-500 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="text-left text-gray-900">
           <HomeGrid threeCards={threeCards} />
         </div>
       </section>

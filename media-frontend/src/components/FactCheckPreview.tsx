@@ -66,7 +66,7 @@ export default function FactCheckPreview() {
   if (claims.length === 0) {
     return (
       <section className="factcheck-section" aria-labelledby="factcheck-title">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
+        <div className="w-full px-4 md:px-6 py-16">
           <div className="factcheck-header">
             <h2 id="factcheck-title">Fact-Check</h2>
             <p className="muted">Aucune vérification disponible pour le moment. Vérifiez votre connexion ou la configuration de Strapi.</p>

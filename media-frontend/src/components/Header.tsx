@@ -29,19 +29,6 @@ export default function Header({ categories = [] }: Readonly<HeaderProps>) {
 
   return (
     <header className="site-header" role="banner" aria-label="En-tête du site">
-      <div className="header-top-bar">
-        <div className="container top-bar-inner">
-          <div className="top-bar-text">
-            <span>{formattedDate}</span>
-            <span className="live-badge">• En Direct de Kinshasa</span>
-          </div>
-          <div className="top-bar-links">
-            <Link href="#" title="À propos" className="top-bar-link">À propos</Link>
-            <Link href="#" title="Contact" className="top-bar-link">Contact</Link>
-          </div>
-        </div>
-      </div>
-
       <div className="container header-inner">
         <Link
           href="/"

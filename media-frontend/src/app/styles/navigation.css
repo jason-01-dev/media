@@ -1,48 +1,4 @@
 /* Top navigation - hidden on mobile */
-.header-top-bar {
-  background: #050505;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.top-bar-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 0.65rem 0;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.88);
-}
-
-.top-bar-text {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.live-badge {
-  color: #FFDB0A;
-  font-weight: 700;
-}
-
-.top-bar-links {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.top-bar-link {
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  transition: color var(--transition-base);
-}
-
-.top-bar-link:hover,
-.top-bar-link:focus-visible {
-  color: #FFD700;
-}
-
 .top-links {
   display: flex;
   gap: 28px;
