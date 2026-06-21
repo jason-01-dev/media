@@ -39,9 +39,9 @@ export default function PaginationComponent({
   // Show page numbers range (max 7 pages)
   const getPageNumbers = () => {
     const delta = 3;
-    const range = [];
-    const rangeWithDots = [];
-    let l;
+    const range: number[] = []; // 👈 Correction : Typé explicitement comme tableau de nombres
+    const rangeWithDots: (number | string)[] = []; // 👈 Correction : Reçoit des nombres ou des chaînes '...'
+    let l: number | undefined; // 👈 Correction : Typé explicitement pour éviter le type 'any' implicite
 
     for (let i = 1; i <= totalPages; i++) {
       if (i === 1 || i === totalPages || (i >= currentPage - delta && i <= currentPage + delta)) {
@@ -50,11 +50,11 @@ export default function PaginationComponent({
     }
 
     range.forEach((i) => {
-      if (l) {
+      if (l !== undefined) {
         if (i - l === 2) {
           rangeWithDots.push(l + 1);
         } else if (i - l !== 1) {
-          rangeWithDots.push(null); // dots
+          rangeWithDots.push('...'); // 👈 Remplacement de null par '...' pour le typage et la clarté
         }
       }
       rangeWithDots.push(i);
@@ -80,7 +80,7 @@ export default function PaginationComponent({
       {/* Page Numbers */}
       <div className="pagination-numbers">
         {getPageNumbers().map((pageNum, idx) => {
-          if (pageNum === null) {
+          if (pageNum === '...') {
             return <span key={`dots-${idx}`} className="pagination-dots">…</span>;
           }
           
@@ -88,7 +88,7 @@ export default function PaginationComponent({
           return (
             <Link
               key={pageNum}
-              href={buildUrl(pageNum)}
+              href={buildUrl(pageNum as number)}
               className={`pagination-number ${isActive ? 'active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
               aria-label={`Page ${pageNum}`}
