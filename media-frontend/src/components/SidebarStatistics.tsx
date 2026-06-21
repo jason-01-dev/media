@@ -50,20 +50,22 @@ export default function SidebarStatistics({
         <section className="sidebar-box">
           <h3 className="sidebar-box-title">📰 Récents</h3>
           <div className="sidebar-articles-list">
-            {recentArticles.slice(0, 5).map(article => (
-              <Link key={article.id} href={`/articles/${article.slug}`} className="sidebar-list-item">
-                {article.cover && (
-                  <div className="sidebar-item-thumb">
-                    <Image
-                      src={strapiImageUrl(article.cover)}
-                      alt={article.title}
-                      width={60}
-                      height={60}
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                <div className="sidebar-item-text">
+            {recentArticles.slice(0, 5).map(article => {
+              const coverUrl = strapiImageUrl(article.cover);
+              return (
+                <Link key={article.id} href={`/articles/${article.slug}`} className="sidebar-list-item">
+                  {coverUrl && (
+                    <div className="sidebar-item-thumb">
+                      <Image
+                        src={coverUrl}
+                        alt={article.title}
+                        width={60}
+                        height={60}
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="sidebar-item-text">
                   <h4>{article.title}</h4>
                   <p className="sidebar-item-date">
                     {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
