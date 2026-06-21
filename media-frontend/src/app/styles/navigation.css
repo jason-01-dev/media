@@ -1,6 +1,6 @@
 /* Top navigation - hidden on mobile */
 .header-top-bar {
-  background: rgba(255, 255, 255, 0.08);
+  background: #050505;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
@@ -11,7 +11,7 @@
   gap: 20px;
   padding: 0.65rem 0;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .top-bar-text {
@@ -60,15 +60,42 @@
 
 .top-links a {
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.95);
+  color: #f8f8f8;
   font-weight: 700;
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: all var(--transition-base);
+  letter-spacing: 0.08em;
+  transition: color var(--transition-base), border-color var(--transition-base);
   border-bottom: 2px solid transparent;
   padding-bottom: 4px;
   position: relative;
+}
+
+.top-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+  transition: background-color var(--transition-base);
+}
+
+.top-links a:hover,
+.top-links a:focus-visible {
+  color: #ffffff;
+}
+
+.top-links a:hover::after,
+.top-links a:focus-visible::after {
+  background: #FFD700;
+}
+
+.top-links a.active,
+.top-links a.active::after {
+  color: #FFD700;
+  background: #FFD700;
 }
 
 .top-links a:hover,
@@ -118,13 +145,18 @@
 
 .search-input {
   padding: 10px 14px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--radius-sm);
   font-size: 14px;
   width: 200px;
   transition: all var(--transition-base);
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
   height: 40px;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 @media (max-width: 768px) {
