@@ -14,6 +14,9 @@ interface Item {
   breaking?: boolean;
   urgent?: boolean;
   slug?: string;
+  source?: string; // 👈 Ajouté pour TypeScript
+  body?: string;   // 👈 Ajouté pour TypeScript
+  note?: string;   // 👈 Ajouté pour TypeScript
 }
 
 export default function UrgentBar() {
@@ -356,7 +359,7 @@ export default function UrgentBar() {
                 )}
 
                 {selectedFactCheck.body && (
-                  <div className="richtext-content" dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(selectedFactCheck.body as string) }} />
+                  <div className="richtext-content" dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(selectedFactCheck.body) }} />
                 )}
 
                 {selectedFactCheck.note && (
