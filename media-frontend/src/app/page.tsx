@@ -3,7 +3,7 @@ import HomeGrid from "@/components/HomeGrid";
 import FactCheckPreview from "@/components/FactCheckPreview";
 import Link from "next/link";
 import Image from "next/image";
-import { strapiImageUrl } from "@/lib/image";
+import { strapiImageUrlPrefer } from "@/lib/image";
 
 export default async function Home() {
   const articlesData = await getArticles({ pagination: { page: 1, pageSize: 20 } });
@@ -17,7 +17,7 @@ export default async function Home() {
   const featuredIds = new Set(featuredArticles.map((a: any) => a.id));
   const threeCards = articles.filter((a: any) => !featuredIds.has(a.id)).slice(0, 3);
   const leadArticle = featuredArticles[0] || articles[0] || null;
-  const leadImageUrl = leadArticle?.cover ? strapiImageUrl(leadArticle.cover, 'large') : null;
+  const leadImageUrl = leadArticle?.cover ? strapiImageUrlPrefer(leadArticle.cover, ['large', 'medium', 'small']) : null;
 
   const getExcerpt = (article: any) =>
     article.description || article.excerpt || article.summary || article.content ||
@@ -33,7 +33,7 @@ export default async function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-b border-gray-200 pb-12">
           <div className="lg:col-span-2">
             <Link
-              href={leadArticle ? `/articles/${leadArticle.slug}` : '#'}
+              href={leadArticle?.slug ? `/articles/${leadArticle.slug}` : '#'}
               className="group block"
             >
               {/* 🛠️ MODIFICATION ICI : Ajout de la classe 'relative' */}
@@ -68,14 +68,17 @@ export default async function Home() {
 
           <div className="space-y-6 border-t lg:border-t-0 lg:border-l lg:pl-8 border-gray-200 pt-6 lg:pt-0">
             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Derniers Décryptages</h3>
-            {threeCards.map((article: any) => (
-              <Link key={article.id} href={`/articles/${article.slug}`} className="block group border-b border-gray-100 pb-4 last:border-0">
-                <span className="text-xs font-bold text-blue-600 uppercase">{getCategoryLabel(article)}</span>
-                <h4 className="font-bold text-lg mt-1 group-hover:text-red-600 transition">
-                  {article.title}
-                </h4>
-              </Link>
-            ))}
+            {threeCards.map((article: any) => {
+              const href = article.slug ? `/articles/${article.slug}` : '#';
+              return (
+                <Link key={article.id} href={href} className="block group border-b border-gray-100 pb-4 last:border-0">
+                  <span className="text-xs font-bold text-blue-600 uppercase">{getCategoryLabel(article)}</span>
+                  <h4 className="font-bold text-lg mt-1 group-hover:text-red-600 transition">
+                    {article.title}
+                  </h4>
+                </Link>
+              );
+            })}
             {threeCards.length === 0 && (
               <div className="text-sm text-gray-600">Aucun article supplémentaire disponible pour le moment.</div>
             )}
