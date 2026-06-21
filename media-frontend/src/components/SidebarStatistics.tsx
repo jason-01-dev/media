@@ -8,14 +8,12 @@ import { useEffect, useState } from 'react';
 
 interface SidebarStatisticsProps {
   recentArticles: Article[];
-  categories: Category[];
   articles: Article[];
 }
 
 export default function SidebarStatistics({ 
-  recentArticles, 
-  categories, 
-  articles 
+  recentArticles,
+  articles,
 }: SidebarStatisticsProps) {
   const [activeUrgentIndex, setActiveUrgentIndex] = useState(0);
   const [activeBreakingIndex, setActiveBreakingIndex] = useState(0);
@@ -50,7 +48,7 @@ export default function SidebarStatistics({
         <section className="sidebar-box">
           <h3 className="sidebar-box-title">📰 Récents</h3>
           <div className="sidebar-articles-list">
-            {recentArticles.slice(0, 5).map(article => {
+            {recentArticles.slice(0, 5).map((article) => {
               const coverUrl = strapiImageUrl(article.cover);
               return (
                 <Link key={article.id} href={`/articles/${article.slug}`} className="sidebar-list-item">
@@ -66,16 +64,17 @@ export default function SidebarStatistics({
                     </div>
                   )}
                   <div className="sidebar-item-text">
-                  <h4>{article.title}</h4>
-                  <p className="sidebar-item-date">
-                    {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
-                      day: 'numeric',
-                      month: 'short'
-                    })}
-                  </p>
-                </div>
-              </Link>
-            ))}
+                    <h4>{article.title}</h4>
+                    <p className="sidebar-item-date">
+                      {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                      })}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
