@@ -15,7 +15,7 @@ const SponsoredSection: React.FC<SponsoredSectionProps> = ({
 }) => {
   // Get 1 article par catégorie (max 4 articles) - les plus récents
   const featuredArticles: Article[] = [];
-  const categoryIds = new Set<string>();
+  const categoryIds = new Set<number>(); // 👈 Correction : Typé avec 'number' au lieu de 'string'
   
   for (const article of articles) {
     if (featuredArticles.length >= 4) break;
@@ -45,7 +45,7 @@ const SponsoredSection: React.FC<SponsoredSectionProps> = ({
                 <div className="featured-article-image">
                   {article.cover ? (
                     <Image
-                      src={strapiImageUrl(article.cover)}
+                      src={strapiImageUrl(article.cover) || ''} // 👈 Sécurité : Ajout de || '' pour TypeScript
                       alt={article.title}
                       fill
                       className="object-cover"
