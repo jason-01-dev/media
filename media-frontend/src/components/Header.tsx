@@ -3,21 +3,48 @@
 import Link from "next/link";
 import { FaBroadcastTower } from "react-icons/fa";
 import SearchBar from "@/components/SearchBar";
-import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import UrgentBar from "@/components/UrgentBar";
 import MobileNav from "@/components/MobileNav";
-import React from "react";
 
 interface HeaderProps {
   categories?: any[];
 }
 
-export default function Header({ categories = [] }: HeaderProps) {
+const MENU_ITEMS = [
+  { href: "/", label: "À la une" },
+  { href: "/fact-check", label: "Fact-Checking" },
+  { href: "/articles?category=economie", label: "Économie" },
+  { href: "/articles?category=technologie", label: "Technologie" },
+  { href: "/articles?category=analyses", label: "Analyses" },
+];
+
+export default function Header({ categories = [] }: Readonly<HeaderProps>) {
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <header className="site-header" role="banner" aria-label="En-tête du site">
+      <div className="header-top-bar">
+        <div className="container top-bar-inner">
+          <div className="top-bar-text">
+            <span>{formattedDate}</span>
+            <span className="live-badge">• En Direct de Kinshasa</span>
+          </div>
+          <div className="top-bar-links">
+            <Link href="#" title="À propos" className="top-bar-link">À propos</Link>
+            <Link href="#" title="Contact" className="top-bar-link">Contact</Link>
+          </div>
+        </div>
+      </div>
+
       <div className="container header-inner">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="site-logo"
           aria-label="Actu24 - Page d'accueil"
         >
@@ -26,15 +53,19 @@ export default function Header({ categories = [] }: HeaderProps) {
           </span>
           <span className="logo-text">Actu<span className="logo-number">24</span></span>
         </Link>
-        
+
         <nav className="top-links" aria-label="Navigation principale">
-          <Link href="/" title="Aller à la page d'accueil">Accueil</Link>
-          <Link href="/articles" title="Voir tous les articles">Articles</Link>
-          <Link href="/about" title="En savoir plus sur nous">À propos</Link>
+          {MENU_ITEMS.map((item) => (
+            <Link key={item.label} href={item.href} title={item.label}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
-        <SearchBar />
-        
+        <div className="header-actions">
+          <SearchBar />
+        </div>
+
         <MobileNav />
       </div>
 

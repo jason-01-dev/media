@@ -1,7 +1,6 @@
 import { getArticles } from "@/lib/strapi";
 import HomeGrid from "@/components/HomeGrid";
 import FactCheckPreview from "@/components/FactCheckPreview";
-import HeroCarousel from "@/components/HeroCarousel";
 import Link from "next/link";
 import Image from "next/image";
 import { strapiImageUrl } from "@/lib/image";
@@ -18,6 +17,7 @@ export default async function Home() {
   const featuredIds = new Set(featuredArticles.map((a: any) => a.id));
   const threeCards = articles.filter((a: any) => !featuredIds.has(a.id)).slice(0, 3);
   const leadArticle = featuredArticles[0] || articles[0] || null;
+  const leadImageUrl = leadArticle?.cover ? strapiImageUrl(leadArticle.cover, 'large') : null;
 
   const getExcerpt = (article: any) =>
     article.description || article.excerpt || article.summary || article.content ||
@@ -31,37 +31,39 @@ export default async function Home() {
         <h2 className="text-xs font-bold uppercase tracking-widest text-red-600 mb-4">À la une</h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-b border-gray-200 pb-12">
-          <Link
-            href={leadArticle ? `/articles/${leadArticle.slug}` : '#'}
-            className="lg:col-span-2 group block"
-          >
-            <div className="overflow-hidden rounded-lg bg-gray-200 mb-4 aspect-[16/9]">
-              {leadArticle?.cover ? (
-                <Image
-                  src={strapiImageUrl(leadArticle.cover, 'large') || ''}
-                  alt={leadArticle.cover?.alternativeText || leadArticle?.title || 'Article'}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 800px"
-                  className="object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-300" />
-              )}
-            </div>
+          <div className="lg:col-span-2">
+            <Link
+              href={leadArticle ? `/articles/${leadArticle.slug}` : '#'}
+              className="group block"
+            >
+              <div className="overflow-hidden rounded-lg bg-gray-200 mb-4 aspect-[16/9]">
+                {leadImageUrl ? (
+                  <Image
+                    src={leadImageUrl}
+                    alt={leadArticle?.cover?.alternativeText || leadArticle?.title || 'Article'}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 800px"
+                    className="object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-300" />
+                )}
+              </div>
 
-            <span className="text-sm font-semibold text-red-600 uppercase tracking-wider">
-              {getCategoryLabel(leadArticle)}
-            </span>
-            <h1 className="text-2xl md:text-4xl font-extrabold mt-2 group-hover:text-red-600 transition leading-tight">
-              {leadArticle?.title || 'Le grand titre de l\'article principal qui capte immédiatement l\'attention du lecteur'}
-            </h1>
-            <p className="text-gray-600 mt-3 text-base md:text-lg line-clamp-3">
-              {leadArticle ? getExcerpt(leadArticle) :
-                "Voici le résumé ou le premier paragraphe de votre article phare. Il donne envie de cliquer pour en savoir plus sur cette investigation ou cette analyse majeure."
-              }
-            </p>
-          </Link>
+              <span className="text-sm font-semibold text-red-600 uppercase tracking-wider">
+                {getCategoryLabel(leadArticle)}
+              </span>
+              <h1 className="text-2xl md:text-4xl font-extrabold mt-2 group-hover:text-red-600 transition leading-tight">
+                {leadArticle?.title || 'Le grand titre de l\'article principal qui capte immédiatement l\'attention du lecteur'}
+              </h1>
+              <p className="text-gray-600 mt-3 text-base md:text-lg line-clamp-3">
+                {leadArticle ? getExcerpt(leadArticle) :
+                  "Voici le résumé ou le premier paragraphe de votre article phare. Il donne envie de cliquer pour en savoir plus sur cette investigation ou cette analyse majeure."
+                }
+              </p>
+            </Link>
+          </div>
 
           <div className="space-y-6 border-t lg:border-t-0 lg:border-l lg:pl-8 border-gray-200 pt-6 lg:pt-0">
             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Derniers Décryptages</h3>
@@ -80,16 +82,8 @@ export default async function Home() {
         </div>
       </main>
 
-      <section className="bg-black text-white py-12 my-8">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 uppercase rounded tracking-wider">Fact-Check</span>
-            <h2 className="text-xl font-bold mt-2">Le composant FactCheckPreview viendra s&apos;insérer ici dynamiquement</h2>
-          </div>
-          <button className="border border-white px-4 py-2 text-sm font-semibold hover:bg-white hover:text-black transition">
-            Voir les vérifications
-          </button>
-        </div>
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-12">
+        <FactCheckPreview />
       </section>
 
       <section className="max-w-7xl mx-auto px-4 md:px-6 py-8">
