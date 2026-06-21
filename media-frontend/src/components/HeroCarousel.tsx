@@ -13,8 +13,16 @@ interface Article {
   cover?: any;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 interface HeroCarouselProps {
   readonly featuredArticles: readonly Article[];
+  readonly allArticles?: readonly Article[];
+  readonly categories?: readonly Category[];
 }
 
 export default function HeroCarousel({ featuredArticles }: HeroCarouselProps) {
