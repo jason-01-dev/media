@@ -62,7 +62,8 @@ export function parseMarkdownToHtml(text: string): string {
 
   // Parse markdown lists: - item => <li>item</li>
   html = html.replace(/^- (.+?)$/gm, '<li>$1</li>');
-  html = html.replace(/(<li>.*?<\/li>)/s, '<ul>$1</ul>');
+  // 👈 Correction ici : Remplacement de (<li>.*?<\/li>)/s par (<li>[\s\S]*?<\/li>)
+  html = html.replace(/(<li>[\s\S]*?<\/li>)/, '<ul>$1</ul>');
 
   // Convert newlines to <br/>
   html = html.replace(/\n/g, '<br/>');
