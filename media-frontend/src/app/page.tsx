@@ -36,7 +36,8 @@ export default async function Home() {
               href={leadArticle ? `/articles/${leadArticle.slug}` : '#'}
               className="group block"
             >
-              <div className="overflow-hidden rounded-lg bg-gray-200 mb-4 aspect-[16/9]">
+              {/* 🛠️ MODIFICATION ICI : Ajout de la classe 'relative' */}
+              <div className="relative overflow-hidden rounded-lg bg-gray-200 mb-4 aspect-[16/9] w-full">
                 {leadImageUrl ? (
                   <Image
                     src={leadImageUrl}
@@ -44,7 +45,7 @@ export default async function Home() {
                     fill
                     sizes="(max-width: 1024px) 100vw, 800px"
                     className="object-cover"
-                    loading="lazy"
+                    priority={true} // ⚡ Charge l'image à la une immédiatement sans lazy-loading
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-300" />
