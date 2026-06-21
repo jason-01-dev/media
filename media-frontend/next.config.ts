@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
     unoptimized: true, // Allow unoptimized images for localhost development
     remotePatterns: [
       {
+        // 🌐 AJOUT POUR LA PRODUCTION : Autoriser les images de ton Strapi sur Render
+        protocol: 'https',
+        hostname: 'strapi-fpkn.onrender.com',
+        pathname: '/**',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
         port: '1337',
