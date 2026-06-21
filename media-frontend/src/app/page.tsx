@@ -17,75 +17,97 @@ export default async function Home() {
 
   const featuredIds = new Set(featuredArticles.map((a: any) => a.id));
   const threeCards = articles.filter((a: any) => !featuredIds.has(a.id)).slice(0, 3);
-  const trendingArticles = articles.filter((a: any) => !featuredIds.has(a.id)).slice(0, 6);
+  const leadArticle = featuredArticles[0] || articles[0] || null;
+
+  const getExcerpt = (article: any) =>
+    article.description || article.excerpt || article.summary || article.content ||
+    "Voici le résumé ou le premier paragraphe de votre article phare. Il donne envie de cliquer pour en savoir plus sur cette investigation ou cette analyse majeure.";
+
+  const getCategoryLabel = (article: any) => article.category?.name || "Actualité";
 
   return (
-    <div className="min-h-screen bg-white">
-      {featuredArticles.length > 0 && (
-        <HeroCarousel featuredArticles={featuredArticles} />
-      )}
+    <div className="min-h-screen bg-slate-50 text-gray-900 font-sans">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+        <h2 className="text-xs font-bold uppercase tracking-widest text-red-600 mb-4">À la une</h2>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-6 pb-16">
-        <div className="layout2">
-          <div className="layout-title hidden">Layout 2</div>
-          <HomeGrid threeCards={threeCards} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 border-b border-gray-200 pb-12">
+          <Link
+            href={leadArticle ? `/articles/${leadArticle.slug}` : '#'}
+            className="lg:col-span-2 group block"
+          >
+            <div className="overflow-hidden rounded-lg bg-gray-200 mb-4 aspect-[16/9]">
+              {leadArticle?.cover ? (
+                <Image
+                  src={strapiImageUrl(leadArticle.cover, 'large') || ''}
+                  alt={leadArticle.cover?.alternativeText || leadArticle?.title || 'Article'}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 800px"
+                  className="object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-300" />
+              )}
+            </div>
+
+            <span className="text-sm font-semibold text-red-600 uppercase tracking-wider">
+              {getCategoryLabel(leadArticle)}
+            </span>
+            <h1 className="text-2xl md:text-4xl font-extrabold mt-2 group-hover:text-red-600 transition leading-tight">
+              {leadArticle?.title || 'Le grand titre de l\'article principal qui capte immédiatement l\'attention du lecteur'}
+            </h1>
+            <p className="text-gray-600 mt-3 text-base md:text-lg line-clamp-3">
+              {leadArticle ? getExcerpt(leadArticle) :
+                "Voici le résumé ou le premier paragraphe de votre article phare. Il donne envie de cliquer pour en savoir plus sur cette investigation ou cette analyse majeure."
+              }
+            </p>
+          </Link>
+
+          <div className="space-y-6 border-t lg:border-t-0 lg:border-l lg:pl-8 border-gray-200 pt-6 lg:pt-0">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Derniers Décryptages</h3>
+            {threeCards.map((article: any) => (
+              <Link key={article.id} href={`/articles/${article.slug}`} className="block group border-b border-gray-100 pb-4 last:border-0">
+                <span className="text-xs font-bold text-blue-600 uppercase">{getCategoryLabel(article)}</span>
+                <h4 className="font-bold text-lg mt-1 group-hover:text-red-600 transition">
+                  {article.title}
+                </h4>
+              </Link>
+            ))}
+            {threeCards.length === 0 && (
+              <div className="text-sm text-gray-600">Aucun article supplémentaire disponible pour le moment.</div>
+            )}
+          </div>
         </div>
       </main>
 
-      <section className="cta-section">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <h2>Consultez tous nos articles</h2>
-          <p>Retrouvez l'intégralité de nos actualités et analyses approfondies.</p>
-          <Link href="/articles" className="btn-primary">
-            Voir tous les articles →
-          </Link>
+      <section className="bg-black text-white py-12 my-8">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 uppercase rounded tracking-wider">Fact-Check</span>
+            <h2 className="text-xl font-bold mt-2">Le composant FactCheckPreview viendra s&apos;insérer ici dynamiquement</h2>
+          </div>
+          <button className="border border-white px-4 py-2 text-sm font-semibold hover:bg-white hover:text-black transition">
+            Voir les vérifications
+          </button>
         </div>
       </section>
 
-      <FactCheckPreview />
+      <section className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+        <div className="border-b-2 border-black pb-2 mb-8">
+          <h2 className="text-2xl font-black uppercase tracking-tight">Les Grands Titres du jour</h2>
+        </div>
+        <div className="bg-gray-100 p-8 text-center text-gray-500 rounded-lg border-2 border-dashed border-gray-300">
+          <HomeGrid threeCards={threeCards} />
+        </div>
+      </section>
 
-      {trendingArticles.length > 0 && (
-        <section className="trending-section">
-          <div className="max-w-7xl mx-auto px-4 md:px-6">
-            <h2 className="section-title">les plus lus</h2>
-            <div className="trending-grid">
-              {trendingArticles.map((article, idx) => {
-                return (
-                  <Link
-                    key={article.id}
-                    href={`/articles/${article.slug}`}
-                    className={`trending-card ${idx === 0 ? 'featured' : ''}`}
-                  >
-                    <div className="trending-index">{idx + 1}</div>
-                    <div className="trending-content">
-                      {article.category && <span className="trending-category">{article.category.name}</span>}
-                      <h3>{article.title}</h3>
-                      <p className="trending-date">
-                        {article.views !== undefined && article.views !== null
-                          ? ` ${article.views.toLocaleString('fr-FR')} vues`
-                          : `Publié le ${new Date(article.publishedAt || article.createdAt).toLocaleDateString('fr-FR')}`}
-                      </p>
-                    </div>
-                    {article.cover && (
-                      <div className="trending-image">
-                        <Image
-                          src={strapiImageUrl(article.cover, 'small') || ''}
-                          alt={article.cover?.alternativeText || article.title}
-                          width={200}
-                          height={120}
-                          sizes="(max-width:768px) 40vw, 200px"
-                          className="object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
+      <section className="bg-white border-t border-gray-200 py-16 text-center">
+        <h3 className="text-xl font-bold mb-2">Vous voulez en voir plus ?</h3>
+        <p className="text-gray-600 mb-6">Accédez à l&apos;intégralité de nos publications et analyses approfondies.</p>
+        <Link href="/articles" className="inline-block bg-red-600 text-white px-6 py-3 font-semibold rounded hover:bg-red-700 transition">
+          Voir tous les articles →
+        </Link>
+      </section>
     </div>
   );
 }
