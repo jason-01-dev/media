@@ -25,7 +25,8 @@ interface HeroCarouselProps {
   readonly categories?: readonly Category[];
 }
 
-export default function HeroCarousel({ featuredArticles }: HeroCarouselProps) {
+// Correction ici : On déstructure toutes les props reçues
+export default function HeroCarousel({ featuredArticles, allArticles, categories }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
