@@ -10,6 +10,27 @@ export const metadata = {
   description: "Consultez tous nos articles d'actualités",
 };
 
+// 📝 Typage strict pour éviter les erreurs de soulignement TypeScript
+interface ArticleData {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string;
+  publishedAt: string;
+  cover?: {
+    alternativeText?: string;
+    url?: string;
+    formats?: any;
+  } | null;
+  category?: {
+    name: string;
+    slug: string;
+  } | null;
+  author?: {
+    name: string;
+  } | null;
+}
+
 type PageProps = Readonly<{
   searchParams?: Promise<{ page?: string; search?: string; category?: string; categories?: string; authors?: string; dateFrom?: string; dateTo?: string; urgent?: string; breaking?: string }>;
 }>;
@@ -100,7 +121,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
     getAuthors(),
   ]);
 
-  const articles = articlesData?.data || [];
+  const articles: ArticleData[] = articlesData?.data || [];
   const categories = categoriesData?.data || [];
   const authors = authorsData?.data || [];
   const total = (articlesData as any)?.meta?.pagination?.total || 0;
@@ -108,9 +129,9 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
 
   return (
     <div className="bg-white">
-      <main className="container">
+      <main className="container mx-auto px-4 py-8">
         <section className="articles-section">
-          <h1 className="section-title">
+          <h1 className="section-title text-3xl font-bold mb-2">
             {search ? `Résultats pour "${search}"` : "Articles"}
           </h1>
           <p className="text-base text-gray-700 mb-8">Découvrez notre sélection complète d'actualités, reportages et analyses</p>
@@ -118,54 +139,61 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
           <AdvancedSearchBar categories={categories} authors={authors} />
 
           {categories.length > 0 && (
-            <div className="article-categories" aria-label="Catégories">
+            <div className="article-categories flex flex-wrap gap-2 my-6" aria-label="Catégories">
               {categories.map((c: any) => (
-                <a key={c.id} href={`/articles?category=${c.slug}`} className="category-pill">{c.name}</a>
+                <Link key={c.id} href={`/articles?category=${c.slug}`} className="category-pill bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full text-sm transition">
+                  {c.name}
+                </Link>
               ))}
             </div>
           )}
 
           {articles.length > 0 ? (
             <>
-              <div className="articles-grid mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                 {articles.map((article) => {
                   const coverUrl = article.cover
                     ? strapiImageUrlPrefer(article.cover, ['medium', 'small', 'thumbnail'])
                     : null;
                   const href = article.slug ? `/articles/${article.slug}` : '#';
+                  
                   return (
-                    <Link key={article.id} href={href}>
-                      <article className="article-card-grid">
-                        <figure className="article-image">
+                    <Link key={article.id} href={href} className="group block h-full">
+                      <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
+                        
+                        {/* 🛠️ MODIFICATION CSS ICI : Ajout de relative, w-full, et d'un aspect-ratio pour forcer l'affichage de l'image */}
+                        <figure className="article-image relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                           {coverUrl ? (
                             <Image
                               src={coverUrl}
                               alt={article.cover?.alternativeText || article.title}
                               fill
-                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              className="object-cover group-hover:scale-105 transition duration-300"
                             />
                           ) : (
-                            <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500">
+                            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-sm">
                               Pas d'image
                             </div>
                           )}
                           {article.category && (
-                            <figcaption className="article-category">
+                            <figcaption className="article-category absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
                               {article.category.name}
                             </figcaption>
                           )}
                         </figure>
-                        <div className="article-body">
-                          <h2>{article.title}</h2>
-                          <p>{article.description}</p>
-                          <footer className="article-meta">
-                            <span className="author">{article.author?.name || "Auteur inconnu"}</span>
+
+                        <div className="article-body p-4 flex flex-col flex-grow">
+                          <h2 className="text-xl font-bold line-clamp-2 group-hover:text-red-600 transition mb-2">{article.title}</h2>
+                          <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">{article.description}</p>
+                          <footer className="article-meta flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto">
+                            <span className="author font-medium text-gray-700">{article.author?.name || "Auteur inconnu"}</span>
                             <span className="date">
-                              {new Date(article.publishedAt).toLocaleDateString("fr-FR", {
+                              {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("fr-FR", {
                                 day: "numeric",
                                 month: "long",
                                 year: "numeric",
-                              })}
+                              }) : "--/--/----"}
                             </span>
                           </footer>
                         </div>
