@@ -141,7 +141,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
           {categories.length > 0 && (
             <div className="article-categories flex flex-wrap gap-2 my-6" aria-label="Catégories">
               {categories.map((c: any) => (
-                <Link key={c.id} href={`/articles?category=${c.slug}`} className="category-pill bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full text-sm transition">
+                <Link key={c.id} href={`/articles?category=${c.slug}`} className="category-pill bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded-full text-sm font-semibold transition">
                   {c.name}
                 </Link>
               ))}
@@ -163,7 +163,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                         
                         <figure className="article-image relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                           {article.category && (
-                            <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-sm">
+                            <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-red-600 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white shadow-sm">
                               {article.category.name}
                             </span>
                           )}
