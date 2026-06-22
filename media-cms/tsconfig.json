@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "CommonJS",
-    "moduleResolution": "Node",
+    "moduleResolution": "node16",
     "lib": ["ES2020"],
     "target": "ES2019",
     "strict": false,
@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "noEmitOnError": true,
     "noImplicitThis": true,
+    "ignoreDeprecations": "6.0",
     "outDir": "dist",
     "rootDir": "."
   },

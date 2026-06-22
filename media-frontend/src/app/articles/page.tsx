@@ -6,7 +6,7 @@ import AdvancedSearchBar from "@/components/AdvancedSearchBar";
 import PaginationComponent from "@/components/PaginationComponent";
 
 export const metadata = {
-  title: "| Actu 24",
+  title: "Articles | Actu 24",
   description: "Consultez tous nos articles d'actualités",
 };
 
@@ -31,7 +31,17 @@ interface ArticleData {
 }
 
 type PageProps = Readonly<{
-  searchParams?: Promise<{ page?: string; search?: string; category?: string; categories?: string; authors?: string; dateFrom?: string; dateTo?: string; urgent?: string; breaking?: string }>;
+  searchParams?: Promise<{
+    page?: string;
+    search?: string;
+    category?: string;
+    categories?: string;
+    authors?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    urgent?: string;
+    breaking?: string;
+  }>;
 }>;
 
 function buildArticleFilters(params: {
@@ -93,12 +103,12 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
   const pageSize = 12;
   const search = params?.search || "";
   const categoryFilter = params?.category || "";
-  const categoriesFilter = params?.categories ? params.categories.split(',') : [];
-  const authorsFilter = params?.authors ? params.authors.split(',').map(Number) : [];
+  const categoriesFilter = params?.categories ? params.categories.split(",") : [];
+  const authorsFilter = params?.authors ? params.authors.split(",").map(Number) : [];
   const dateFrom = params?.dateFrom || "";
   const dateTo = params?.dateTo || "";
-  const urgent = params?.urgent === 'true';
-  const breaking = params?.breaking === 'true';
+  const urgent = params?.urgent === "true";
+  const breaking = params?.breaking === "true";
 
   const filters = buildArticleFilters({
     search,
@@ -127,44 +137,51 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="bg-white">
-      <main className="container mx-auto px-4 py-8">
-        <section className="articles-section">
-          <h1 className="section-title text-3xl font-bold mb-2">
+    <div className="bg-gray-50 min-h-screen">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <section>
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
             {search ? `Résultats pour "${search}"` : "Articles"}
           </h1>
-          <p className="text-base text-gray-700 mb-8">Découvrez notre sélection complète d'actualités, reportages et analyses</p>
+          <p className="text-gray-500 text-base mb-8">
+            Découvrez notre sélection complète d'actualités, reportages et analyses
+          </p>
 
           <AdvancedSearchBar categories={categories} authors={authors} />
 
+          {/* BARRE DES CATÉGORIES FLOTTANTES */}
           {categories.length > 0 && (
-            <div className="article-categories flex flex-wrap gap-2 my-6" aria-label="Catégories">
+            <div className="flex flex-wrap gap-2 my-6" aria-label="Catégories">
               {categories.map((c: any) => (
-                <Link key={c.id} href={`/articles?category=${c.slug}`} className="category-pill bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded-full text-sm font-semibold transition">
+                <Link
+                  key={c.id}
+                  href={`/articles?category=${c.slug}`}
+                  className="bg-red-50 text-red-700 hover:bg-red-100 px-4 py-1.5 rounded-full text-sm font-semibold transition duration-200"
+                >
                   {c.name}
                 </Link>
               ))}
             </div>
           )}
 
+          {/* GRILLE D'ARTICLES PILOTÉE PAR TON CSS */}
           {articles.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                 {articles.map((article) => {
                   const coverUrl = article.cover
-                    ? strapiImageUrlPrefer(article.cover, ['large', 'medium', 'small', 'thumbnail'])
+                    ? strapiImageUrlPrefer(article.cover, ["large", "medium", "small", "thumbnail"])
                     : null;
-                  const href = article.slug ? `/articles/${article.slug}` : '#';
-                  
+                  const href = article.slug ? `/articles/${article.slug}` : "#";
+
                   return (
                     <Link key={article.id} href={href} className="group block h-full">
-                      {/* 🛠️ SÉCURITÉ CARD : Pas de h-full, hauteur automatique gérée par le contenu */}
-                      <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition flex flex-col h-auto bg-white">
+                      <article className="article-card-grid">
                         
-                        {/* 🛠️ SÉCURITÉ IMAGE : Ajout de aspect-[16/10] et block complet pour figer l'emplacement */}
-                        <div className="w-full aspect-[16/10] bg-gray-100 relative overflow-hidden block min-h-[150px] max-h-[240px] z-10">
+                        {/* 1. Zone Image verrouillée par le CSS */}
+                        <div className="article-image-wrapper">
                           {article.category && (
-                            <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-20 shadow">
+                            <span className="article-grid-badge">
                               {article.category.name}
                             </span>
                           )}
@@ -184,50 +201,52 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                           )}
                         </div>
 
-                        {/* 🛠️ SÉCURITÉ TEXTE : Remplacement complet des classes et forçage du rendu statique visible */}
-                        <div className="p-4 flex flex-col flex-1 min-h-[180px] bg-white relative z-20">
-                          <h2 className="text-xl font-bold group-hover:text-red-600 transition mb-2 text-gray-900 block static overflow-visible clear-both">
-                            {article.title}
-                          </h2>
-                          <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-1">
-                            {article.description}
-                          </p>
-                          <footer className="flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto">
-                            <span className="author font-medium text-gray-700">
-                              {article.author?.name || "Auteur inconnu"}
+                        {/* 2. Zone Contenu Texte gérée par le CSS */}
+                        <div className="article-body">
+                          <h2>{article.title}</h2>
+                          <p>{article.description}</p>
+
+                          {/* 3. Pied de page de la carte (Auteur + Date) collé en bas */}
+                          <footer className="article-card-footer">
+                            <span className="article-card-author">
+                              {article.author?.name || "Rédaction"}
                             </span>
-                            <span className="date">
-                              {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("fr-FR", {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              }) : "--/--/----"}
+                            <span>
+                              {article.publishedAt
+                                ? new Date(article.publishedAt).toLocaleDateString("fr-FR", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                  })
+                                : "--/--/----"}
                             </span>
                           </footer>
                         </div>
+
                       </article>
                     </Link>
                   );
                 })}
               </div>
 
+              {/* COMPOSANT DE PAGINATION */}
               <PaginationComponent
                 currentPage={page}
                 totalPages={totalPages}
                 queryParams={{
                   ...(search && { search }),
                   ...(categoryFilter && { category: categoryFilter }),
-                  ...(categoriesFilter.length > 0 && { categories: categoriesFilter.join(',') }),
-                  ...(authorsFilter.length > 0 && { authors: authorsFilter.join(',') }),
+                  ...(categoriesFilter.length > 0 && { categories: categoriesFilter.join(",") }),
+                  ...(authorsFilter.length > 0 && { authors: authorsFilter.join(",") }),
                   ...(dateFrom && { dateFrom }),
                   ...(dateTo && { dateTo }),
-                  ...(urgent && { urgent: 'true' }),
-                  ...(breaking && { breaking: 'true' }),
+                  ...(urgent && { urgent: "true" }),
+                  ...(breaking && { breaking: "true" }),
                 }}
               />
             </>
           ) : (
-            <div className="text-center py-20">
+            <div className="text-center py-20 bg-white rounded-lg border border-gray-200 mt-8">
               <p className="text-xl text-gray-600">Aucun article trouvé.</p>
             </div>
           )}

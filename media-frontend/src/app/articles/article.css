@@ -1,4 +1,6 @@
-/* Article page styles */
+/* ==========================================================================
+   ARTICLE PAGE STYLES (INTEGRAL & CORRIGE)
+   ========================================================================== */
 
 .article-hero {
   position: relative;
@@ -696,42 +698,103 @@
   }
 }
 
+/* ==========================================================================
+   STYLE DE LA GRILLE DE LISTING D'ARTICLES (CORRIGÉ & SÉCURISÉ)
+   ========================================================================== */
+
+/* La carte principale uniforme */
 .article-card-grid {
   background-color: #ffffff;
-  height: auto !important; /* Supprime les hauteurs bloquantes */
-  min-height: 100%;       /* Permet d'égaliser les cartes proprement */
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
+  height: 100% !important; /* Force toutes les cartes à prendre la hauteur maximale de leur ligne */
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* Conteneur du texte (titre + description) */
+/* Effet premium au survol */
+.article-card-grid:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
+  border-color: var(--brand, #cbd5e1);
+}
+
+/* Zone pour verrouiller le ratio de l'image (format 16/10 parfait) */
+.article-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background-color: #f3f4f6;
+  overflow: hidden;
+}
+
+/* Badge de catégorie positionné sur l'image */
+.article-grid-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 20;
+}
+
+/* Conteneur global du bloc de texte */
 .article-body {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  flex-shrink: 0;        /* IMPORTANT : Interdit au navigateur d'écraser cette zone */
-  padding: 16px;
+  flex-grow: 1; /* Remplit le vide restant pour pousser le footer vers le bas */
+  padding: 20px;
 }
 
-/* Gestion du titre de la carte */
+/* Titre de l'article avec limite stricte à 2 lignes */
 .article-body h2 {
-  font-size: 1.25rem;    /* Équivalent text-xl */
-  font-weight: 700;
-  line-height: 1.4;
-  margin-bottom: 8px;
-  flex-shrink: 0;        /* Empêche le titre de se faire compresser à 0px */
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  color: #111827 !important;
+  margin: 0 0 8px 0 !important;
   display: -webkit-box !important;
-  -webkit-box-orient: vertical;
-  overflow: visible !important; /* Évite que le texte disparaisse au moindre pixel de débordement */
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* Sécurité pour le texte de description */
+/* Description avec limite stricte à 3 lignes */
 .article-body p {
-  flex-grow: 1;          /* Occupe l'espace restant sans pousser le titre dehors */
+  font-size: 14px !important;
+  color: #4b5563 !important;
+  line-height: 1.6 !important;
+  margin: 0 0 20px 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* Bloc auteur et date tout en bas */
-.article-meta {
-  margin-top: auto;      /* Aligne le footer parfaitement en bas de la carte */
-  padding-top: 12px;
+/* Bloc pied de page (Auteur + Date) aligné au millimètre */
+.article-card-footer {
+  margin-top: auto !important; /* Force l'alignement sur la ligne du bas */
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 12px !important;
+  color: #9ca3af !important;
+  border-top: 1px solid #f3f4f6 !important;
+  padding-top: 12px !important;
+}
+
+.article-card-author {
+  font-weight: 600 !important;
+  color: #374151 !important;
 }
