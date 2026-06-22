@@ -162,6 +162,11 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                       <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
                         
                         <figure className="article-image relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                          {article.category && (
+                            <span className="absolute left-3 top-3 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-900 shadow-sm">
+                              {article.category.name}
+                            </span>
+                          )}
                           {coverUrl ? (
                             <Image
                               src={coverUrl}
@@ -178,11 +183,6 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                         </figure>
 
                         <div className="article-body p-4 flex flex-col flex-grow">
-                          {article.category && (
-                            <p className="text-xs uppercase text-red-600 font-semibold mb-2">
-                              {article.category.name}
-                            </p>
-                          )}
                           <h2 className="text-xl font-bold line-clamp-2 group-hover:text-red-600 transition mb-2">{article.title}</h2>
                           <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">{article.description}</p>
                           <footer className="article-meta flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto">
