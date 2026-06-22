@@ -695,3 +695,43 @@
     margin-bottom: 0;
   }
 }
+
+.article-card-grid {
+  background-color: #ffffff;
+  height: auto !important; /* Supprime les hauteurs bloquantes */
+  min-height: 100%;       /* Permet d'égaliser les cartes proprement */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Conteneur du texte (titre + description) */
+.article-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 0;        /* IMPORTANT : Interdit au navigateur d'écraser cette zone */
+  padding: 16px;
+}
+
+/* Gestion du titre de la carte */
+.article-body h2 {
+  font-size: 1.25rem;    /* Équivalent text-xl */
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  flex-shrink: 0;        /* Empêche le titre de se faire compresser à 0px */
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  overflow: visible !important; /* Évite que le texte disparaisse au moindre pixel de débordement */
+}
+
+/* Sécurité pour le texte de description */
+.article-body p {
+  flex-grow: 1;          /* Occupe l'espace restant sans pousser le titre dehors */
+}
+
+/* Bloc auteur et date tout en bas */
+.article-meta {
+  margin-top: auto;      /* Aligne le footer parfaitement en bas de la carte */
+  padding-top: 12px;
+}
