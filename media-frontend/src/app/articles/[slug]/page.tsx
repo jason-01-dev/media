@@ -1,5 +1,5 @@
 import { getArticleBySlug, getArticles } from "@/lib/strapi";
-import { strapiImageUrl } from "@/lib/image";
+import { strapiImageUrlPrefer } from "@/lib/image";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import RelatedArticlesSidebar from "@/components/RelatedArticlesSidebar";
 import Link from "next/link";
@@ -35,7 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const imageUrl = article.cover ? strapiImageUrl(article.cover) : null;
+  const imageUrl = article.cover
+    ? strapiImageUrlPrefer(article.cover, ['large', 'medium', 'small', 'thumbnail'])
+    : null;
 
   return {
     title: article.title,
@@ -67,6 +69,13 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
   if (!article) {
     notFound();
   }
+
+  const articleCoverUrl = article.cover
+    ? strapiImageUrlPrefer(article.cover, ['large', 'medium', 'small', 'thumbnail'])
+    : null;
+  const authorAvatarUrl = article.author?.avatar
+    ? strapiImageUrlPrefer(article.author.avatar, ['thumbnail', 'small'])
+    : null;
 
   const allArticles = await getArticles({ pagination: { page: 1, pageSize: 20 } });
   // Try to get related articles by category, fallback to all articles if none found
@@ -101,10 +110,10 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
         </div>
 
         {/* Hero Image with Title */}
-        {article.cover && (
+        {articleCoverUrl && (
           <section className="article-hero">
             <Image
-              src={strapiImageUrl(article.cover) || ''}
+              src={articleCoverUrl}
               alt={article.cover?.alternativeText || article.title}
               fill
               style={{ objectFit: 'cover' }}
@@ -126,10 +135,10 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
           <div className="article-main">
           <div className="article-header">
             <div className="article-author-info">
-              {article.author?.avatar && (
+              {authorAvatarUrl && (
                 <Image
-                  src={strapiImageUrl(article.author.avatar) || ''}
-                  alt={article.author.name || 'Auteur'}
+                  src={authorAvatarUrl}
+                  alt={article.author?.name || 'Auteur'}
                   width={48}
                   height={48}
                   className="article-author-avatar"
@@ -243,21 +252,27 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
               <section className="articles-section">
                 <h3>Voir d'autres articles</h3>
                 <div className="articles-grid-3">
-                  {moreArticles.map((other: any) => (
-                    <Link key={other.id} href={`/articles/${other.slug}`} className="article-card-small">
-                      {other.cover && (
-                        <Image
-                          src={strapiImageUrl(other.cover) || ''}
-                          alt={other.cover?.alternativeText || other.title}
-                          width={300}
-                          height={140}
-                        />
-                      )}
-                      <div className="article-card-small-body">
-                        <h4>{other.title}</h4>
-                      </div>
-                    </Link>
-                  ))}
+                  {moreArticles.map((other: any) => {
+                    const otherCoverUrl = other.cover
+                      ? strapiImageUrlPrefer(other.cover, ['small', 'thumbnail'])
+                      : null;
+                    const href = other.slug ? `/articles/${other.slug}` : '#';
+                    return (
+                      <Link key={other.id} href={href} className="article-card-small">
+                        {otherCoverUrl && (
+                          <Image
+                            src={otherCoverUrl}
+                            alt={other.cover?.alternativeText || other.title}
+                            width={300}
+                            height={140}
+                          />
+                        )}
+                        <div className="article-card-small-body">
+                          <h4>{other.title}</h4>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </section>
             )}
@@ -267,21 +282,27 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
               <section className="articles-section">
                 <h3>Articles connexes</h3>
                 <div className="articles-grid-3">
-                  {relatedArticles.map((relArticle: any) => (
-                    <Link key={relArticle.id} href={`/articles/${relArticle.slug}`} className="article-card-small">
-                      {relArticle.cover && (
-                        <Image
-                          src={strapiImageUrl(relArticle.cover) || ''}
-                          alt={relArticle.cover?.alternativeText || relArticle.title}
-                          width={300}
-                          height={140}
-                        />
-                      )}
-                      <div className="article-card-small-body">
-                        <h4>{relArticle.title}</h4>
-                      </div>
-                    </Link>
-                  ))}
+                  {relatedArticles.map((relArticle: any) => {
+                    const relCoverUrl = relArticle.cover
+                      ? strapiImageUrlPrefer(relArticle.cover, ['small', 'thumbnail'])
+                      : null;
+                    const href = relArticle.slug ? `/articles/${relArticle.slug}` : '#';
+                    return (
+                      <Link key={relArticle.id} href={href} className="article-card-small">
+                        {relCoverUrl && (
+                          <Image
+                            src={relCoverUrl}
+                            alt={relArticle.cover?.alternativeText || relArticle.title}
+                            width={300}
+                            height={140}
+                          />
+                        )}
+                        <div className="article-card-small-body">
+                          <h4>{relArticle.title}</h4>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </section>
             )}

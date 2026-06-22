@@ -42,15 +42,19 @@ export default function HeroCarousel({ featuredArticles, allArticles, categories
   const article = featuredArticles[currentIndex];
   if (!article) return null;
 
+  const coverUrl = article.cover
+    ? strapiImageUrlPrefer(article.cover, ['large', 'medium', 'small', 'thumbnail'])
+    : null;
+
   const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % featuredArticles.length);
   const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + featuredArticles.length) % featuredArticles.length);
 
   return (
     <section className="hero-wrapper" aria-label={article.title}>
       <div className="hero-image">
-        {article.cover ? (
+        {coverUrl ? (
           <Image
-            src={strapiImageUrlPrefer(article.cover, ['large', 'medium']) || ''}
+            src={coverUrl}
             alt={article.cover?.alternativeText || article.title}
             fill
             priority={currentIndex === 0}

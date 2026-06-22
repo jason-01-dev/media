@@ -2,19 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Article, Category } from '@/lib/strapi';
-import { strapiImageUrl } from '@/lib/image';
+import { Article } from '@/lib/strapi';
+import { strapiImageUrlPrefer } from '@/lib/image';
 import { useEffect, useState } from 'react';
 
 interface SidebarStatisticsProps {
-  recentArticles: Article[];
-  articles: Article[];
+  readonly recentArticles: Article[];
+  readonly articles: Article[];
 }
 
-export default function SidebarStatistics({ 
-  recentArticles,
-  articles,
-}: SidebarStatisticsProps) {
+export default function SidebarStatistics(props: Readonly<SidebarStatisticsProps>) {
+  const { recentArticles, articles } = props;
   const [activeUrgentIndex, setActiveUrgentIndex] = useState(0);
   const [activeBreakingIndex, setActiveBreakingIndex] = useState(0);
 
@@ -49,9 +47,12 @@ export default function SidebarStatistics({
           <h3 className="sidebar-box-title">📰 Récents</h3>
           <div className="sidebar-articles-list">
             {recentArticles.slice(0, 5).map((article) => {
-              const coverUrl = strapiImageUrl(article.cover);
+              const coverUrl = article.cover
+                ? strapiImageUrlPrefer(article.cover, ['thumbnail', 'small'])
+                : null;
+              const href = article.slug ? `/articles/${article.slug}` : '#';
               return (
-                <Link key={article.id} href={`/articles/${article.slug}`} className="sidebar-list-item">
+                <Link key={article.id} href={href} className="sidebar-list-item">
                   {coverUrl && (
                     <div className="sidebar-item-thumb">
                       <Image
@@ -84,7 +85,10 @@ export default function SidebarStatistics({
         <section className="sidebar-box sidebar-box-urgent">
           <h3 className="sidebar-box-title">🚨 Urgent</h3>
           <div className="sidebar-articles-list">
-            <Link href={`/articles/${urgentArticles[activeUrgentIndex].slug}`} className="sidebar-list-item urgent">
+            <Link
+              href={urgentArticles[activeUrgentIndex]?.slug ? `/articles/${urgentArticles[activeUrgentIndex].slug}` : '#'}
+              className="sidebar-list-item urgent"
+            >
               <div className="sidebar-item-text">
                 <h4>{urgentArticles[activeUrgentIndex].title}</h4>
                 <span className="urgent-badge">Urgent</span>
@@ -104,7 +108,10 @@ export default function SidebarStatistics({
         <section className="sidebar-box sidebar-box-breaking">
           <h3 className="sidebar-box-title">⚡ Últimas</h3>
           <div className="sidebar-articles-list">
-            <Link href={`/articles/${breakingArticles[activeBreakingIndex].slug}`} className="sidebar-list-item breaking">
+            <Link
+              href={breakingArticles[activeBreakingIndex]?.slug ? `/articles/${breakingArticles[activeBreakingIndex].slug}` : '#'}
+              className="sidebar-list-item breaking"
+            >
               <div className="sidebar-item-text">
                 <h4>{breakingArticles[activeBreakingIndex].title}</h4>
                 <span className="breaking-badge">Última noticia</span>

@@ -1,5 +1,5 @@
 import { getArticles, getCategories, getAuthors } from "@/lib/strapi";
-import { strapiImageUrl } from "@/lib/image";
+import { strapiImageUrlPrefer } from "@/lib/image";
 import Link from "next/link";
 import Image from "next/image";
 import AdvancedSearchBar from "@/components/AdvancedSearchBar";
@@ -128,45 +128,51 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
           {articles.length > 0 ? (
             <>
               <div className="articles-grid mt-8">
-                {articles.map((article) => (
-                  <Link key={article.id} href={`/articles/${article.slug}`}>
-                    <article className="article-card-grid">
-                      <figure className="article-image">
-                        {article.cover ? (
-                          <Image
-                            src={strapiImageUrl(article.cover) || ""}
-                            alt={article.cover?.alternativeText || article.title}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500">
-                            Pas d'image
-                          </div>
-                        )}
-                        {article.category && (
-                          <figcaption className="article-category">
-                            {article.category.name}
-                          </figcaption>
-                        )}
-                      </figure>
-                      <div className="article-body">
-                        <h2>{article.title}</h2>
-                        <p>{article.description}</p>
-                        <footer className="article-meta">
-                          <span className="author">{article.author?.name || "Auteur inconnu"}</span>
-                          <span className="date">
-                            {new Date(article.publishedAt).toLocaleDateString("fr-FR", {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            })}
-                          </span>
-                        </footer>
-                      </div>
-                    </article>
-                  </Link>
-                ))}
+                {articles.map((article) => {
+                  const coverUrl = article.cover
+                    ? strapiImageUrlPrefer(article.cover, ['medium', 'small', 'thumbnail'])
+                    : null;
+                  const href = article.slug ? `/articles/${article.slug}` : '#';
+                  return (
+                    <Link key={article.id} href={href}>
+                      <article className="article-card-grid">
+                        <figure className="article-image">
+                          {coverUrl ? (
+                            <Image
+                              src={coverUrl}
+                              alt={article.cover?.alternativeText || article.title}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500">
+                              Pas d'image
+                            </div>
+                          )}
+                          {article.category && (
+                            <figcaption className="article-category">
+                              {article.category.name}
+                            </figcaption>
+                          )}
+                        </figure>
+                        <div className="article-body">
+                          <h2>{article.title}</h2>
+                          <p>{article.description}</p>
+                          <footer className="article-meta">
+                            <span className="author">{article.author?.name || "Auteur inconnu"}</span>
+                            <span className="date">
+                              {new Date(article.publishedAt).toLocaleDateString("fr-FR", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </footer>
+                        </div>
+                      </article>
+                    </Link>
+                  );
+                })}
               </div>
 
               <PaginationComponent

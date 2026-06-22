@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Category, Article } from '@/lib/strapi';
-import { strapiImageUrl } from '@/lib/image';
+import { strapiImageUrlPrefer } from '@/lib/image';
 
 interface SponsoredSectionProps {
   categories: Category[];
@@ -36,30 +36,36 @@ const SponsoredSection: React.FC<SponsoredSectionProps> = ({
           </div>
           
           <div className="featured-articles-row">
-            {featuredArticles.map((article) => (
-              <Link 
-                key={article.id}
-                href={`/articles/${article.slug}`} 
-                className="featured-article-card"
-              >
-                <div className="featured-article-image">
-                  {article.cover ? (
-                    <Image
-                      src={strapiImageUrl(article.cover) || ''} // 👈 Sécurité : Ajout de || '' pour TypeScript
-                      alt={article.title}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="no-image">Pas d'image</div>
-                  )}
-                </div>
-                <div className="featured-article-body">
-                  <span className="article-category-tag">{article.category?.name}</span>
-                  <h4>{article.title}</h4>
-                </div>
-              </Link>
-            ))}
+            {featuredArticles.map((article) => {
+              const coverUrl = article.cover
+                ? strapiImageUrlPrefer(article.cover, ['medium', 'small', 'thumbnail'])
+                : null;
+              const href = article.slug ? `/articles/${article.slug}` : '#';
+              return (
+                <Link 
+                  key={article.id}
+                  href={href} 
+                  className="featured-article-card"
+                >
+                  <div className="featured-article-image">
+                    {coverUrl ? (
+                      <Image
+                        src={coverUrl}
+                        alt={article.cover?.alternativeText || article.title}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="no-image">Pas d'image</div>
+                    )}
+                  </div>
+                  <div className="featured-article-body">
+                    <span className="article-category-tag">{article.category?.name}</span>
+                    <h4>{article.title}</h4>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
