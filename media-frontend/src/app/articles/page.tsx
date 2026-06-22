@@ -116,6 +116,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
     getArticles({
       pagination: { page, pageSize },
       filters: Object.keys(filters).length > 0 ? filters : undefined,
+      // 🛠️ FIX : On a retiré la ligne 'populate' qui provoquait l'erreur TypeScript !
     }),
     getCategories(),
     getAuthors(),
