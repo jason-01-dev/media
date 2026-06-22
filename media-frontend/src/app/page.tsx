@@ -26,7 +26,8 @@ export default async function Home() {
   const leadArticle = featuredArticles[0] || articles[0] || null;
   const leadImageUrl = leadArticle?.cover ? strapiImageUrlPrefer(leadArticle.cover, ['large', 'medium', 'small', 'thumbnail']) : null;
 
-  const getExcerpt = (article: Article) =>
+  // 🛠️ FIX : Ajout de & Record<string, any> pour autoriser .excerpt et .summary sans erreur TypeScript
+  const getExcerpt = (article: Article & Record<string, any>) =>
     article.description || article.excerpt || article.summary || article.content ||
     "Voici le résumé ou le premier paragraphe de votre article phare. Il donne envie de cliquer pour en savoir plus sur cette investigation ou cette analyse majeure.";
 
@@ -43,7 +44,6 @@ export default async function Home() {
               href={leadArticle?.slug ? `/articles/${leadArticle.slug}` : '#'}
               className="group block"
             >
-              {/* 🛠️ MODIFICATION ICI : Ajout de la classe 'relative' */}
               <div className="relative overflow-hidden rounded-lg bg-gray-200 mb-4 aspect-[16/9] w-full">
                 {leadImageUrl ? (
                   <Image
@@ -52,7 +52,7 @@ export default async function Home() {
                     fill
                     sizes="(max-width: 1024px) 100vw, 800px"
                     className="object-cover"
-                    priority={true} // ⚡ Charge l'image à la une immédiatement sans lazy-loading
+                    priority={true}
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-300" />
