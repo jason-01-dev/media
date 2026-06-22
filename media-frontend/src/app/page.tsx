@@ -17,7 +17,7 @@ export default async function Home() {
   const featuredIds = new Set(featuredArticles.map((a: any) => a.id));
   const threeCards = articles.filter((a: any) => !featuredIds.has(a.id)).slice(0, 3);
   const leadArticle = featuredArticles[0] || articles[0] || null;
-  const leadImageUrl = leadArticle?.cover ? strapiImageUrlPrefer(leadArticle.cover, ['large', 'medium', 'small']) : null;
+  const leadImageUrl = leadArticle?.cover ? strapiImageUrlPrefer(leadArticle.cover, ['large', 'medium', 'small', 'thumbnail']) : null;
 
   const getExcerpt = (article: any) =>
     article.description || article.excerpt || article.summary || article.content ||
