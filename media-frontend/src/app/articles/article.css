@@ -32,9 +32,10 @@
 }
 
 .article-category-badge {
+  position: relative;
   display: inline-block;
   background: rgba(193, 18, 31, 0.95);
-  padding: 8px 14px;
+  padding: 8px 14px 8px 24px;
   font-weight: 900;
   font-size: 11px;
   text-transform: uppercase;
@@ -42,6 +43,19 @@
   width: fit-content;
   letter-spacing: 0.05em;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.article-category-badge::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 10px solid rgba(255,255,255,0.95);
 }
 
 .article-hero-title {

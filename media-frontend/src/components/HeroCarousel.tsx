@@ -10,7 +10,8 @@ interface Article {
   title: string;
   slug: string;
   description: string;
-  cover?: any;
+  cover?: Record<string, unknown>;
+  category?: Category;
 }
 
 interface Category {
@@ -21,12 +22,10 @@ interface Category {
 
 interface HeroCarouselProps {
   readonly featuredArticles: readonly Article[];
-  readonly allArticles?: readonly Article[];
-  readonly categories?: readonly Category[];
 }
 
 // Correction ici : On déstructure toutes les props reçues
-export default function HeroCarousel({ featuredArticles, allArticles, categories }: HeroCarouselProps) {
+export default function HeroCarousel({ featuredArticles }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -67,11 +66,11 @@ export default function HeroCarousel({ featuredArticles, allArticles, categories
       </div>
 
       <div className="hero-content">
-        <span className="category-badge">À LA UNE</span>
+        <span className="category-badge">{article.category?.name || 'À LA UNE'}</span>
         <h1>{article.title}</h1>
         {article.description && <p className="lead">{article.description}</p>}
         <Link href={`/articles/${article.slug}`} className="hero-btn">
-          Lire l'article →
+          Lire l&apos;article →
         </Link>
 
         {featuredArticles.length > 1 && (
