@@ -10,7 +10,11 @@ interface Article {
   title: string;
   slug: string;
   description: string;
-  cover?: Record<string, unknown>;
+  // 🛠️ FIX : On remplace 'Record<string, unknown>' par un typage précis pour Strapi
+  cover?: {
+    alternativeText?: string | null;
+    [key: string]: any; 
+  };
   category?: Category;
 }
 
@@ -24,7 +28,6 @@ interface HeroCarouselProps {
   readonly featuredArticles: readonly Article[];
 }
 
-// Correction ici : On déstructure toutes les props reçues
 export default function HeroCarousel({ featuredArticles }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -54,7 +57,8 @@ export default function HeroCarousel({ featuredArticles }: HeroCarouselProps) {
         {coverUrl ? (
           <Image
             src={coverUrl}
-            alt={article.cover?.alternativeText || article.title}
+            // 🛠️ Sécurité supplémentaire : si alternativeText et title n'existent pas, on passe 'Article image'
+            alt={article.cover?.alternativeText || article.title || 'Article image'}
             fill
             priority={currentIndex === 0}
             loading={currentIndex === 0 ? 'eager' : 'lazy'}
