@@ -153,7 +153,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                 {articles.map((article) => {
                   const coverUrl = article.cover
-                    ? strapiImageUrlPrefer(article.cover, ['medium', 'small', 'thumbnail'])
+                    ? strapiImageUrlPrefer(article.cover, ['large', 'medium', 'small', 'thumbnail'])
                     : null;
                   const href = article.slug ? `/articles/${article.slug}` : '#';
                   
@@ -161,7 +161,6 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                     <Link key={article.id} href={href} className="group block h-full">
                       <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
                         
-                        {/* 🛠️ MODIFICATION CSS ICI : Ajout de relative, w-full, et d'un aspect-ratio pour forcer l'affichage de l'image */}
                         <figure className="article-image relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                           {coverUrl ? (
                             <Image
@@ -176,14 +175,14 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                               Pas d'image
                             </div>
                           )}
-                          {article.category && (
-                            <figcaption className="article-category absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-                              {article.category.name}
-                            </figcaption>
-                          )}
                         </figure>
 
                         <div className="article-body p-4 flex flex-col flex-grow">
+                          {article.category && (
+                            <p className="text-xs uppercase text-red-600 font-semibold mb-2">
+                              {article.category.name}
+                            </p>
+                          )}
                           <h2 className="text-xl font-bold line-clamp-2 group-hover:text-red-600 transition mb-2">{article.title}</h2>
                           <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">{article.description}</p>
                           <footer className="article-meta flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto">
