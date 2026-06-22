@@ -1,4 +1,4 @@
-import { getArticles } from "@/lib/strapi";
+import { Article, getArticles } from "@/lib/strapi";
 import HomeGrid from "@/components/HomeGrid";
 import FactCheckPreview from "@/components/FactCheckPreview";
 import Link from "next/link";
@@ -6,24 +6,31 @@ import Image from "next/image";
 import { strapiImageUrlPrefer } from "@/lib/image";
 
 export default async function Home() {
-  const articlesData = await getArticles({ pagination: { page: 1, pageSize: 20 } });
+  const [articlesData, featuredData] = await Promise.all([
+    getArticles({ pagination: { page: 1, pageSize: 20 } }),
+    getArticles({
+      filters: { featured: { $eq: true } },
+      sort: '-createdAt',
+      pagination: { page: 1, pageSize: 3 },
+    }),
+  ]);
 
-  const articles = articlesData?.data || [];
-  const featuredArticles = articles.filter((a: any) => a.featured === true).slice(0, 3);
+  const articles: Article[] = articlesData?.data || [];
+  const featuredArticles: Article[] = featuredData?.data || [];
   if (featuredArticles.length === 0 && articles.length > 0) {
     featuredArticles.push(articles[0]);
   }
 
-  const featuredIds = new Set(featuredArticles.map((a: any) => a.id));
-  const threeCards = articles.filter((a: any) => !featuredIds.has(a.id)).slice(0, 3);
+  const featuredIds = new Set<number>(featuredArticles.map((a) => a.id));
+  const threeCards = articles.filter((a) => !featuredIds.has(a.id)).slice(0, 3);
   const leadArticle = featuredArticles[0] || articles[0] || null;
   const leadImageUrl = leadArticle?.cover ? strapiImageUrlPrefer(leadArticle.cover, ['large', 'medium', 'small', 'thumbnail']) : null;
 
-  const getExcerpt = (article: any) =>
+  const getExcerpt = (article: Article) =>
     article.description || article.excerpt || article.summary || article.content ||
     "Voici le résumé ou le premier paragraphe de votre article phare. Il donne envie de cliquer pour en savoir plus sur cette investigation ou cette analyse majeure.";
 
-  const getCategoryLabel = (article: any) => article.category?.name || "Actualité";
+  const getCategoryLabel = (article: Article) => article.category?.name || "Actualité";
 
   return (
     <div className="min-h-screen bg-slate-50 text-gray-900 font-sans">
@@ -68,7 +75,7 @@ export default async function Home() {
 
           <div className="space-y-6 border-t lg:border-t-0 lg:border-l lg:pl-8 border-gray-200 pt-6 lg:pt-0">
             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Derniers Décryptages</h3>
-            {threeCards.map((article: any) => {
+            {threeCards.map((article: Article) => {
               const href = article.slug ? `/articles/${article.slug}` : '#';
               return (
                 <Link key={article.id} href={href} className="block group border-b border-gray-100 pb-4 last:border-0">

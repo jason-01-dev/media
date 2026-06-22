@@ -126,25 +126,28 @@ function buildQueryString(options: QueryOptions): string {
 
   // filters: Strapi v5 expects filters[fieldName][$operator]=value format
   if (options.filters) {
-    const buildFilters = (obj: any, prefix: string = 'filters') => {
+    type RawFilters = Record<string, unknown>;
+
+    const buildFilters = (obj: RawFilters, prefix: string = 'filters') => {
       for (const key of Object.keys(obj)) {
         const value = obj[key];
-        
-        // Check if this is an operator (starts with $)
-        if (key.startsWith('$')) {
-          // Operator found - add to params
-          params.append(prefix, String(value));
-        } else if (typeof value === 'object' && value !== null) {
-          // Nested object - recurse
-          buildFilters(value, `${prefix}[${key}]`);
+        const paramName = `${prefix}[${key}]`;
+
+        if (value === null || value === undefined) {
+          continue;
+        }
+
+        if (Array.isArray(value)) {
+          params.append(paramName, value.map((item) => String(item)).join(','));
+        } else if (typeof value === 'object') {
+          buildFilters(value as RawFilters, paramName);
         } else {
-          // Simple value
-          params.append(`${prefix}[${key}]`, String(value));
+          params.append(paramName, String(value));
         }
       }
     };
-    
-    buildFilters(options.filters);
+
+    buildFilters(options.filters as Record<string, unknown>);
   }
 
   if (options.sort) {
@@ -186,6 +189,44 @@ function buildStrapiUrl(base: string, path: string, options?: QueryOptions): str
   return url.toString();
 }
 
+function normalizeStrapiEntity(entity: unknown): unknown {
+  if (entity == null) return entity;
+  if (Array.isArray(entity)) return entity.map(normalizeStrapiEntity);
+  if (typeof entity !== 'object') return entity;
+
+  const objectEntity = entity as Record<string, unknown>;
+  if (objectEntity.attributes && typeof objectEntity.attributes === 'object') {
+    const normalized = { ...(objectEntity.attributes as Record<string, unknown>) } as Record<string, unknown>;
+    if (objectEntity.id !== undefined) {
+      normalized.id = objectEntity.id;
+    }
+    for (const key of Object.keys(normalized)) {
+      normalized[key] = normalizeStrapiEntity(normalized[key]);
+    }
+    return normalized;
+  }
+
+  if (objectEntity.data && typeof objectEntity.data === 'object') {
+    return normalizeStrapiEntity(objectEntity.data);
+  }
+
+  const normalized: Record<string, unknown> = {};
+  for (const key of Object.keys(objectEntity)) {
+    normalized[key] = normalizeStrapiEntity(objectEntity[key]);
+  }
+  return normalized;
+}
+
+function normalizeStrapiResponse<T>(response: unknown): { data: T[]; meta?: unknown } | null {
+  if (!response || typeof response !== 'object') return null;
+  const objectResponse = response as Record<string, unknown>;
+  const rawData = Array.isArray(objectResponse.data) ? objectResponse.data : [];
+  return {
+    data: rawData.map(normalizeStrapiEntity) as T[],
+    meta: objectResponse.meta,
+  };
+}
+
 function buildStrapiHeaders(token?: string): HeadersInit {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -203,7 +244,7 @@ function getCurrentHost(): string | undefined {
     return undefined;
   }
 
-  return (globalThis as any).location?.hostname;
+  return (globalThis as { location?: Location }).location?.hostname;
 }
 
 async function fetchStrapi<T>(path: string, options?: QueryOptions): Promise<T | null> {
@@ -251,30 +292,34 @@ async function fetchStrapi<T>(path: string, options?: QueryOptions): Promise<T |
  * API Queries
  */
 
-export async function getArticles(options?: Omit<QueryOptions, 'populate'>): Promise<{ data: Article[] } | null> {
-  return fetchStrapi('/articles', {
+export async function getArticles(options?: Omit<QueryOptions, 'populate'>): Promise<{ data: Article[]; meta?: unknown } | null> {
+  const response = await fetchStrapi('/articles', {
     populate: ['author', 'category', 'cover', 'author.avatar'],
     sort: '-createdAt',
     ...options,
   });
+  return normalizeStrapiResponse<Article>(response);
 }
 
-export async function getArticleBySlug(slug: string): Promise<{ data: Article[] } | null> {
-  return fetchStrapi('/articles', {
+export async function getArticleBySlug(slug: string): Promise<{ data: Article[]; meta?: unknown } | null> {
+  const response = await fetchStrapi('/articles', {
     populate: ['author', 'category', 'cover', 'blocks', 'author.avatar'],
     filters: { slug: { $eq: slug } },
     fields: ['title', 'slug', 'description', 'body', 'publishedAt', 'updatedAt', 'createdAt'],
   });
+  return normalizeStrapiResponse<Article>(response);
 }
 
-export async function getAuthors(): Promise<{ data: Author[] } | null> {
-  return fetchStrapi('/authors', {
+export async function getAuthors(): Promise<{ data: Author[]; meta?: unknown } | null> {
+  const response = await fetchStrapi('/authors', {
     populate: ['avatar'],
   });
+  return normalizeStrapiResponse<Author>(response);
 }
 
-export async function getCategories(): Promise<{ data: Category[] } | null> {
-  return fetchStrapi('/categories');
+export async function getCategories(): Promise<{ data: Category[]; meta?: unknown } | null> {
+  const response = await fetchStrapi('/categories');
+  return normalizeStrapiResponse<Category>(response);
 }
 
 export async function getGlobal(): Promise<{ data: Global } | null> {
