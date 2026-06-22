@@ -10,7 +10,6 @@ export const metadata = {
   description: "Consultez tous nos articles d'actualités",
 };
 
-// 📝 Typage strict pour éviter les erreurs de soulignement TypeScript
 interface ArticleData {
   id: number;
   title: string;
@@ -159,12 +158,13 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                   
                   return (
                     <Link key={article.id} href={href} className="group block h-full">
-                      {/* 🛠️ MODIFICATION : Retrait de h-full pour laisser le texte respirer à l'arrivée de la photo */}
-                      <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
+                      {/* 🛠️ SÉCURITÉ CARD : Pas de h-full, hauteur automatique gérée par le contenu */}
+                      <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition flex flex-col h-auto bg-white">
                         
-                        <figure className="article-image relative w-full aspect-[16/10] bg-gray-100 overflow-hidden shrink-0">
+                        {/* 🛠️ SÉCURITÉ IMAGE : Ajout de aspect-[16/10] et block complet pour figer l'emplacement */}
+                        <div className="w-full aspect-[16/10] bg-gray-100 relative overflow-hidden block min-h-[150px] max-h-[240px] z-10">
                           {article.category && (
-                            <span className="article-category">
+                            <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-20 shadow">
                               {article.category.name}
                             </span>
                           )}
@@ -182,14 +182,20 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                               Pas d'image
                             </div>
                           )}
-                        </figure>
+                        </div>
 
-                        {/* 🛠️ MODIFICATION : Ajout d'un min-h et de verrous pour empêcher le titre d'être écrasé à 0px */}
-                        <div className="article-body p-4 flex flex-col flex-grow shrink-0 min-h-[160px]">
-                          <h2 className="text-xl font-bold line-clamp-2 group-hover:text-red-600 transition mb-2 shrink-0">{article.title}</h2>
-                          <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">{article.description}</p>
-                          <footer className="article-meta flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto shrink-0">
-                            <span className="author font-medium text-gray-700">{article.author?.name || "Auteur inconnu"}</span>
+                        {/* 🛠️ SÉCURITÉ TEXTE : Remplacement complet des classes et forçage du rendu statique visible */}
+                        <div className="p-4 flex flex-col flex-1 min-h-[180px] bg-white relative z-20">
+                          <h2 className="text-xl font-bold group-hover:text-red-600 transition mb-2 text-gray-900 block static overflow-visible clear-both">
+                            {article.title}
+                          </h2>
+                          <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-1">
+                            {article.description}
+                          </p>
+                          <footer className="flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto">
+                            <span className="author font-medium text-gray-700">
+                              {article.author?.name || "Auteur inconnu"}
+                            </span>
                             <span className="date">
                               {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("fr-FR", {
                                 day: "numeric",
