@@ -116,7 +116,6 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
     getArticles({
       pagination: { page, pageSize },
       filters: Object.keys(filters).length > 0 ? filters : undefined,
-      // 🛠️ FIX : On a retiré la ligne 'populate' qui provoquait l'erreur TypeScript !
     }),
     getCategories(),
     getAuthors(),
@@ -160,9 +159,10 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                   
                   return (
                     <Link key={article.id} href={href} className="group block h-full">
-                      <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition h-full flex flex-col">
+                      {/* 🛠️ MODIFICATION : Retrait de h-full pour laisser le texte respirer à l'arrivée de la photo */}
+                      <article className="article-card-grid border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition flex flex-col">
                         
-                        <figure className="article-image relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                        <figure className="article-image relative w-full aspect-[16/10] bg-gray-100 overflow-hidden shrink-0">
                           {article.category && (
                             <span className="article-category">
                               {article.category.name}
@@ -175,6 +175,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                               fill
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               className="object-cover group-hover:scale-105 transition duration-300"
+                              priority={page === 1}
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-sm">
@@ -183,10 +184,11 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                           )}
                         </figure>
 
-                        <div className="article-body p-4 flex flex-col flex-grow">
-                          <h2 className="text-xl font-bold line-clamp-2 group-hover:text-red-600 transition mb-2">{article.title}</h2>
+                        {/* 🛠️ MODIFICATION : Ajout d'un min-h et de verrous pour empêcher le titre d'être écrasé à 0px */}
+                        <div className="article-body p-4 flex flex-col flex-grow shrink-0 min-h-[160px]">
+                          <h2 className="text-xl font-bold line-clamp-2 group-hover:text-red-600 transition mb-2 shrink-0">{article.title}</h2>
                           <p className="text-gray-600 text-sm line-clamp-3 mb-4 flex-grow">{article.description}</p>
-                          <footer className="article-meta flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto">
+                          <footer className="article-meta flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3 mt-auto shrink-0">
                             <span className="author font-medium text-gray-700">{article.author?.name || "Auteur inconnu"}</span>
                             <span className="date">
                               {article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("fr-FR", {
