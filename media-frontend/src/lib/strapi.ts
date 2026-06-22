@@ -305,7 +305,6 @@ export async function getArticleBySlug(slug: string): Promise<{ data: Article[];
   const response = await fetchStrapi('/articles', {
     populate: ['author', 'category', 'cover', 'blocks', 'author.avatar'],
     filters: { slug: { $eq: slug } },
-    fields: ['title', 'slug', 'description', 'body', 'publishedAt', 'updatedAt', 'createdAt'],
   });
   return normalizeStrapiResponse<Article>(response);
 }
