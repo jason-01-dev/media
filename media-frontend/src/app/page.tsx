@@ -15,18 +15,27 @@ type PageProps = {
     page?: string;
   }>;
 };
-
-export default async function Home({ searchParams }: PageProps) {
-  // Attente obligatoire des searchParams pour Next.js Server Components
+export default async function Home({ searchParams }: any) {
+  // 1. Attente des paramètres de l'URL (?category=...)
   const params = await searchParams;
   const page = Number.parseInt(params?.page ?? "1", 10);
   const pageSize = 20;
 
-  // Récupération stable de toutes les données en parallèle
+  // 2. Récupération de la catégorie cliquée
+  const categoryFilter = params?.category || "";
+
+  // 3. Construction du filtre pour Strapi
+  const filters: any = {};
+  if (categoryFilter) {
+    filters.category = { slug: { $eq: categoryFilter } };
+  }
+
+  // 4. Récupération stable de toutes les données avec le filtre inclus
   const [articlesData, categoriesData, authorsData] = await Promise.all([
     getArticles({
       pagination: { page, pageSize },
       sort: "publishedAt:desc",
+      filters: Object.keys(filters).length > 0 ? filters : undefined,
     }),
     getCategories(),
     getAuthors(),
@@ -62,9 +71,21 @@ export default async function Home({ searchParams }: PageProps) {
           {/* Liste des catégories affichée proprement juste au-dessus du titre */}
           {categories && categories.length > 0 && (
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-bold uppercase tracking-widest text-red-600">
+              
+              {/* Bouton "Tout" pour désélectionner le filtre */}
+              <div className="flex items-center">
+                <Link href="/" className={`hover:text-slate-900 transition hover:underline ${!categoryFilter ? 'underline text-slate-900 font-black' : ''}`}>
+                  Tout
+                </Link>
+                <span className="ml-4 text-gray-300 font-normal select-none">•</span>
+              </div>
+
               {categories.map((cat: any, index: number) => (
                 <div key={cat.id || index} className="flex items-center">
-                  <Link href={`/?category=${cat.slug}`} className="hover:text-slate-900 transition hover:underline">
+                  <Link 
+                    href={`/?category=${cat.slug}`} 
+                    className={`hover:text-slate-900 transition hover:underline ${categoryFilter === cat.slug ? 'underline text-slate-900 font-black' : ''}`}
+                  >
                     {cat.name}
                   </Link>
                   {index < categories.length - 1 && (
