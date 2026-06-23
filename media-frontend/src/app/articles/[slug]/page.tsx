@@ -18,7 +18,7 @@ export async function generateStaticParams() {
   const articlesData = await getArticles();
   const articles = articlesData?.data || [];
   
-  return articles.map((article) => ({
+  return articles.map((article: any) => ({
     slug: article.slug,
   }));
 }
@@ -41,12 +41,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: article.title,
-    description: article.description,
+    description: article.description || "",
     keywords: article.category?.name ? [article.category.name] : [],
     authors: article.author ? [{ name: article.author.name }] : [],
     openGraph: {
       title: article.title,
-      description: article.description,
+      description: article.description || "",
       type: "article",
       publishedTime: article.publishedAt,
       url: `/articles/${article.slug}`,
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: article.title,
-      description: article.description,
+      description: article.description || "",
       images: imageUrl ? [imageUrl] : [],
     },
   };
@@ -78,28 +78,28 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
     : null;
 
   const allArticles = await getArticles({ pagination: { page: 1, pageSize: 20 } });
-  // Try to get related articles by category, fallback to all articles if none found
-  let relatedArticles = (allArticles?.data || [])
-    .filter((a: any) => a.id !== article.id && a.category?.id === article.category?.id)
-    .slice(0, 4);
   
-  // If no related articles, get top articles from backend
-  if (relatedArticles.length === 0) {
-    relatedArticles = (allArticles?.data || [])
-      .filter((a: any) => a.id !== article.id)
-      .slice(0, 4);
-  }
+  // Articles de la même catégorie (Connexes)
+  const relatedArticles = (allArticles?.data || [])
+    .filter((a: any) => a.id !== article.id && a.category?.id === article.category?.id)
+    .slice(0, 3);
+  
+  // Autres thématiques pour la fin de page (Exclut l'article courant et les connexes)
   const moreArticles = (allArticles?.data || [])
-    .filter((a: any) => a.id !== article.id)
-    .slice(0, 6);
+    .filter((a: any) => a.id !== article.id && !relatedArticles.some((r: any) => r.id === a.id))
+    .slice(0, 3);
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const articleUrl = `${siteUrl}/articles/${article.slug}`;
 
+  const wordCount = article.description ? article.description.split(' ').length : 0;
+  const readingTime = Math.ceil(wordCount / 200) || 1;
+
   return (
-    <div style={{ background: '#fff' }}>
-      <main className="article-container">
-        {/* Breadcrumb above hero */}
-        <div style={{ padding: '20px 0', borderBottom: '1px solid #e5e7eb' }}>
+    <div className="article-page-wrapper">
+      {/* Zone Fil d'ariane clean */}
+      <div className="breadcrumb-section">
+        <div className="content-container">
           <Breadcrumbs 
             items={[
               { label: 'Articles', href: '/articles' },
@@ -108,211 +108,156 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
             ]}
           />
         </div>
+      </div>
 
-        {/* Hero Image with Title */}
-        {articleCoverUrl && (
-          <section className="article-hero">
-            <Image
-              src={articleCoverUrl}
-              alt={article.cover?.alternativeText || article.title}
-              fill
-              style={{ objectFit: 'cover' }}
-              priority
-            />
-            <div className="article-hero-overlay">
-              {article.category && (
-                <span className="article-category-badge">
-                  {article.category.name}
-                </span>
-              )}
-              <h1 className="article-hero-title">{article.title}</h1>
-            </div>
-          </section>
-        )}
-
-        <div className="article-wrapper">
-          {/* Main Content */}
-          <div className="article-main">
-          <div className="article-header">
-            <div className="article-author-info">
-              {authorAvatarUrl && (
-                <Image
-                  src={authorAvatarUrl}
-                  alt={article.author?.name || 'Auteur'}
-                  width={48}
-                  height={48}
-                  className="article-author-avatar"
-                />
-              )}
-              <div className="author-text">
-                <h4>
-                  {article.author?.name || "Auteur inconnu"}
-                </h4>
-                <p>
-                  {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-              </div>
-            </div>
-            <div className="article-meta">
-              <span className="reading-time">
-                Lecture: ~{Math.ceil(article.description.split(' ').length / 200)} min
+      <main className="content-container main-layout">
+        <div className="primary-content">
+          
+          {/* Titre & Méta en tête (Style Journal Épuré) */}
+          <header className="article-main-header">
+            {article.category && (
+              <span className="category-tag-badge">
+                {article.category.name}
               </span>
-              {/* Social Share */}
-              <div className="article-social">
-                <a
-                  className="social-btn"
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Partager sur Facebook"
-                  title="Facebook"
-                >
-                  <FaFacebookF className="social-icon" />
-                </a>
-                <a
-                  className="social-btn"
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(articleUrl)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Partager sur X"
-                  title="X (Twitter)"
-                >
-                  <FaTwitter className="social-icon" />
-                </a>
-                <a
-                  className="social-btn"
-                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(article.title + ' ' + articleUrl)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Partager sur WhatsApp"
-                  title="WhatsApp"
-                >
-                  <FaWhatsapp className="social-icon" />
-                </a>
-                <a
-                  className="social-btn"
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Partager sur LinkedIn"
-                  title="LinkedIn"
-                >
-                  <FaLinkedin className="social-icon" />
-                </a>
+            )}
+            <h1 className="main-article-title">{article.title}</h1>
+            
+            <div className="author-meta-bar">
+              <div className="author-identity">
+                {authorAvatarUrl && (
+                  <Image
+                    src={authorAvatarUrl}
+                    alt={article.author?.name || 'Auteur'}
+                    width={44}
+                    height={44}
+                    className="author-round-avatar"
+                  />
+                )}
+                <div className="author-details">
+                  <span className="author-name">{article.author?.name || "Auteur inconnu"}</span>
+                  <span className="publish-date">
+                    Publié le {new Date(article.publishedAt).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })} à {new Date(article.publishedAt).toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit' }).split(' ').pop()}
+                  </span>
+                </div>
+              </div>
+
+              <div className="meta-utilities">
+                <span className="time-badge">⏱️ {readingTime} min de lecture</span>
+                <div className="share-buttons-group">
+                  <a className="share-link fb" href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`} target="_blank" rel="noopener noreferrer" title="Facebook"><FaFacebookF /></a>
+                  <a className="share-link x" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(articleUrl)}`} target="_blank" rel="noopener noreferrer" title="X"><FaTwitter /></a>
+                  <a className="share-link wa" href={`https://api.whatsapp.com/send?text=${encodeURIComponent(article.title + ' ' + articleUrl)}`} target="_blank" rel="noopener noreferrer" title="WhatsApp"><FaWhatsapp /></a>
+                  <a className="share-link ln" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(articleUrl)}`} target="_blank" rel="noopener noreferrer" title="LinkedIn"><FaLinkedin /></a>
+                </div>
               </div>
             </div>
-          </div>
+          </header>
 
-        {/* Article Content */}
-        <article className="article-content">
-          {/* Introduction paragraph */}
-          <p>{article.description}</p>
-          
-          {/* Render body field from Strapi (Markdown converted to HTML) */}
-          {article.body && (
-            <div 
-              dangerouslySetInnerHTML={{ __html: marked.parse(article.body) }}
-            />
+          {/* Image Principale (Bannière Cinématique) */}
+          {articleCoverUrl && (
+            <section className="main-hero-showcase">
+              <Image
+                src={articleCoverUrl}
+                alt={article.cover?.alternativeText || article.title}
+                fill
+                className="hero-cover-img"
+                priority
+              />
+            </section>
           )}
-          
-          {/* Render blocks if available */}
-          {article.blocks && article.blocks.length > 0 && (
-            article.blocks.map((block: any, index: number) => {
-              const key = block.id ?? `${block.__component}-${index}`;
-              if (block.__component === "shared.rich-text" && block.body) {
-                return (
-                  <div 
-                    key={key}
-                    dangerouslySetInnerHTML={{ __html: block.body }}
-                  />
-                );
-              }
-              if (block.__component === "shared.quote") {
-                return (
-                  <blockquote 
-                    key={key}
-                  >
-                    "{block.quote}" — <strong>{block.title || "Source"}</strong>
-                  </blockquote>
-                );
-              }
-              return null;
-            })
+
+          {/* Corps de l'article */}
+          <article className="typography-body">
+            {article.description && (
+              <p className="article-lead-paragraph">
+                {article.description}
+              </p>
+            )}
+            
+            {article.body && (
+              <div className="markdown-compiled-content" dangerouslySetInnerHTML={{ __html: marked.parse(article.body) }} />
+            )}
+            
+            {article.blocks && article.blocks.length > 0 && (
+              <div className="additional-content-blocks">
+                {article.blocks.map((block: any, index: number) => {
+                  const key = block.id ?? `${block.__component}-${index}`;
+                  if (block.__component === "shared.rich-text" && block.body) {
+                    return <div key={key} className="rich-text-block" dangerouslySetInnerHTML={{ __html: block.body }} />;
+                  }
+                  if (block.__component === "shared.quote") {
+                    return (
+                      <blockquote key={key} className="styled-editorial-quote">
+                        <p>« {block.quote} »</p>
+                        {block.title && <cite>— {block.title}</cite>}
+                      </blockquote>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+            )}
+          </article>
+
+          {/* Section Recommandations : Articles Connexes (Même catégorie) */}
+          {relatedArticles.length > 0 && (
+            <section className="editorial-suggestions-section">
+              <div className="section-title-wrapper">
+                <h3 className="section-title">Dans la même catégorie</h3>
+              </div>
+              <div className="suggestions-cards-grid">
+                {relatedArticles.map((relArticle: any) => {
+                  const relCoverUrl = relArticle.cover ? strapiImageUrlPrefer(relArticle.cover, ['medium', 'small']) : null;
+                  return (
+                    <Link key={relArticle.id} href={`/articles/${relArticle.slug}`} className="suggestion-item-card">
+                      <div className="card-media-wrapper">
+                        {relCoverUrl && <Image src={relCoverUrl} alt={relArticle.title} fill className="card-img" />}
+                      </div>
+                      <div className="card-info-content">
+                        <h4>{relArticle.title}</h4>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
           )}
-        </article>
 
-            {/* More Articles */}
-            {moreArticles.length > 0 && (
-              <section className="articles-section">
-                <h3>Voir d'autres articles</h3>
-                <div className="articles-grid-3">
-                  {moreArticles.map((other: any) => {
-                    const otherCoverUrl = other.cover
-                      ? strapiImageUrlPrefer(other.cover, ['small', 'thumbnail'])
-                      : null;
-                    const href = other.slug ? `/articles/${other.slug}` : '#';
-                    return (
-                      <Link key={other.id} href={href} className="article-card-small">
-                        {otherCoverUrl && (
-                          <Image
-                            src={otherCoverUrl}
-                            alt={other.cover?.alternativeText || other.title}
-                            width={300}
-                            height={140}
-                          />
-                        )}
-                        <div className="article-card-small-body">
-                          <h4>{other.title}</h4>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-
-            {/* Related Articles */}
-            {relatedArticles.length > 0 && (
-              <section className="articles-section">
-                <h3>Articles connexes</h3>
-                <div className="articles-grid-3">
-                  {relatedArticles.map((relArticle: any) => {
-                    const relCoverUrl = relArticle.cover
-                      ? strapiImageUrlPrefer(relArticle.cover, ['small', 'thumbnail'])
-                      : null;
-                    const href = relArticle.slug ? `/articles/${relArticle.slug}` : '#';
-                    return (
-                      <Link key={relArticle.id} href={href} className="article-card-small">
-                        {relCoverUrl && (
-                          <Image
-                            src={relCoverUrl}
-                            alt={relArticle.cover?.alternativeText || relArticle.title}
-                            width={300}
-                            height={140}
-                          />
-                        )}
-                        <div className="article-card-small-body">
-                          <h4>{relArticle.title}</h4>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-          </div>
-
-          {/* Sidebar - À Lire Aussi */}
-          <aside className="article-sidebar">
-            <RelatedArticlesSidebar articles={relatedArticles} currentArticleId={article.id} limit={4} />
-          </aside>
+          {/* Section Recommandations : Découvrir plus (Autres catégories) */}
+          {moreArticles.length > 0 && (
+            <section className="editorial-suggestions-section variant-line">
+              <div className="section-title-wrapper">
+                <h3 className="section-title">À découvrir aussi</h3>
+              </div>
+              <div className="suggestions-cards-grid">
+                {moreArticles.map((other: any) => {
+                  const otherCoverUrl = other.cover ? strapiImageUrlPrefer(other.cover, ['medium', 'small']) : null;
+                  return (
+                    <Link key={other.id} href={`/articles/${other.slug}`} className="suggestion-item-card">
+                      <div className="card-media-wrapper">
+                        {otherCoverUrl && <Image src={otherCoverUrl} alt={other.title} fill className="card-img" />}
+                      </div>
+                      <div className="card-info-content">
+                        <h4>{other.title}</h4>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
+
+        {/* Colonne de Droite (Sidebar Éditoriale Fixe / Sticky) */}
+        <aside className="secondary-sidebar">
+          <div className="sticky-sidebar-container">
+            <RelatedArticlesSidebar articles={allArticles?.data?.slice(0, 5) || []} currentArticleId={article.id} limit={4} />
+          </div>
+        </aside>
       </main>
     </div>
   );
