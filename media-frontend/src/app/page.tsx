@@ -54,13 +54,32 @@ export default async function Home({ searchParams }: PageProps) {
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-8">
 
         {/* HEADER */}
-        <div className="mb-10 border-b pb-6">
-          <h1 className="text-4xl md:text-5xl font-black font-serif">
-            L'Information Décryptée
-          </h1>
+<div className="mb-10 border-b pb-6">
+  
+  {/* Liste horizontale des catégories de Strapi */}
+  {categories && categories.length > 0 ? (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-bold uppercase tracking-widest text-red-600">
+      {categories.map((cat: any, index: number) => (
+        <div key={cat.id || cat.documentId || index} className="flex items-center">
+          <Link href={`/?category=${cat.slug}`} className="hover:text-slate-900 transition hover:underline">
+            {cat.name}
+          </Link>
+          {index < categories.length - 1 && (
+            <span className="ml-4 text-gray-300 font-normal select-none">•</span>
+          )}
         </div>
+      ))}
+    </div>
+  ) : (
+    <div className="mb-4 text-xs italic text-gray-400 normal-case">
+      (Aucune catégorie reçue. Vérifie les permissions "Public -> find" pour les Categories dans l'admin Strapi)
+    </div>
+  )}
 
-        <AdvancedSearchBar categories={categories} authors={authors} />
+  <h1 className="text-4xl md:text-5xl font-black font-serif text-slate-900">
+    L'Information Décryptée
+  </h1>
+</div>
 
         {/* HERO */}
         {leadArticle && (
