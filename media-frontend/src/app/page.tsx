@@ -125,12 +125,13 @@ export default async function Home({ searchParams }: PageProps) {
         </section>
 
         {/* FACT CHECK */}
-        <section className="mb-12">
-          <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
-            <FactCheckPreview />
-          </div>
-        </section>
-
+        <section className="w-screen relative left-1/2 -ml-[50vw] my-16">
+  <div className="bg-white border-y py-10">
+    <div className="max-w-7xl mx-auto px-4 md:px-6">
+      <FactCheckPreview />
+    </div>
+  </div>
+</section>
         {/* MAIN FEED */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold mb-8 font-serif">
