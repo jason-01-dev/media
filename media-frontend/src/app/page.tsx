@@ -66,28 +66,29 @@ export default async function Home({ searchParams }: PageProps) {
         {leadArticle && (
           <section className="mb-12">
             <Link href={`/articles/${leadArticle.slug}`}>
-              <div className="relative h-[420px] rounded-xl overflow-hidden group">
+              <div className="relative h-[420px] rounded-xl overflow-hidden group shadow-sm bg-gray-200">
                 {getImage(leadArticle) && (
                   <Image
                     src={getImage(leadArticle)}
                     alt={leadArticle.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition"
+                    className="object-cover group-hover:scale-105 transition duration-300"
+                    priority
                   />
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-                <div className="absolute bottom-0 p-6 text-white">
-                  <span className="text-xs bg-red-600 px-2 py-1 uppercase font-bold">
+                <div className="absolute bottom-0 p-6 text-white max-w-3xl">
+                  <span className="text-xs bg-red-600 px-2 py-1 uppercase font-bold tracking-wider rounded-sm">
                     À LA UNE
                   </span>
 
-                  <h2 className="text-3xl md:text-4xl font-bold mt-3">
+                  <h2 className="text-3xl md:text-4xl font-bold mt-3 leading-tight">
                     {leadArticle.title}
                   </h2>
 
-                  <p className="mt-2 text-gray-200 line-clamp-2">
+                  <p className="mt-2 text-gray-200 line-clamp-2 text-sm md:text-base">
                     {getExcerpt(leadArticle)}
                   </p>
                 </div>
@@ -100,23 +101,23 @@ export default async function Home({ searchParams }: PageProps) {
         <section className="grid md:grid-cols-3 gap-6 mb-12">
           {topArticles.map((article) => (
             <Link key={article.id} href={`/articles/${article.slug}`}>
-              <div className="group">
-                <div className="relative h-40 mb-3">
+              <div className="group bg-white p-3 rounded-xl border border-gray-100 shadow-sm h-full transition hover:shadow-md">
+                <div className="relative h-44 mb-3 overflow-hidden rounded-lg bg-gray-100">
                   {getImage(article) && (
                     <Image
                       src={getImage(article)}
                       alt={article.title}
                       fill
-                      className="object-cover rounded-lg"
+                      className="object-cover group-hover:scale-105 transition duration-300"
                     />
                   )}
                 </div>
 
-                <span className="text-xs text-red-600 uppercase font-semibold">
+                <span className="text-xs text-red-600 uppercase font-semibold tracking-wide">
                   {getCategoryLabel(article)}
                 </span>
 
-                <h3 className="font-bold mt-1 group-hover:text-red-600">
+                <h3 className="font-bold mt-1 group-hover:text-red-600 line-clamp-2 text-base transition">
                   {article.title}
                 </h3>
               </div>
@@ -126,44 +127,45 @@ export default async function Home({ searchParams }: PageProps) {
 
         {/* FACT CHECK */}
         <section className="w-screen relative left-1/2 -ml-[50vw] my-16">
-  <div className="bg-white border-y py-10">
-    <div className="max-w-7xl mx-auto px-4 md:px-6">
-      <FactCheckPreview />
-    </div>
-  </div>
-</section>
+          <div className="bg-white border-y py-10 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 md:px-6">
+              <FactCheckPreview />
+            </div>
+          </div>
+        </section>
+
         {/* MAIN FEED */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 font-serif">
+          <h2 className="text-2xl font-bold mb-8 font-serif border-b pb-2">
             Flux d’actualité
           </h2>
 
-          <div className="space-y-10">
+          <div className="space-y-8">
             {mainArticles.map((article) => (
               <Link key={article.id} href={`/articles/${article.slug}`}>
-                <div className="flex gap-6 border-b pb-6 hover:bg-gray-50">
+                <div className="flex gap-6 border-b pb-6 group hover:bg-gray-50/50 p-2 rounded-lg transition">
                   
-                  <div className="w-1/3 relative h-28">
+                  <div className="w-1/3 relative h-32 md:h-36 overflow-hidden rounded-lg bg-gray-100 flex-shrink-0">
                     {getImage(article) && (
                       <Image
                         src={getImage(article)}
                         alt={article.title}
                         fill
-                        className="object-cover rounded-lg"
+                        className="object-cover group-hover:scale-105 transition duration-300"
                       />
                     )}
                   </div>
 
-                  <div className="w-2/3">
-                    <span className="text-xs text-red-600 uppercase font-semibold">
+                  <div className="w-2/3 flex flex-col justify-center">
+                    <span className="text-xs text-red-600 uppercase font-semibold tracking-wide">
                       {getCategoryLabel(article)}
                     </span>
 
-                    <h3 className="text-lg font-bold mt-1">
+                    <h3 className="text-lg font-bold mt-1 group-hover:text-red-600 transition line-clamp-2">
                       {article.title}
                     </h3>
 
-                    <p className="text-gray-600 mt-2 line-clamp-2 text-sm">
+                    <p className="text-gray-600 mt-2 line-clamp-2 text-sm hidden md:block">
                       {getExcerpt(article)}
                     </p>
                   </div>
@@ -174,9 +176,9 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         </section>
 
-        {/* CATEGORIES */}
-        <section className="space-y-14">
-          {categories.slice(0, 3).map((cat: any) => {
+        {/* CATEGORIES SECTIONS */}
+        <section className="space-y-16">
+          {categories.map((cat: any) => {
             const catArticles = articles
               .filter((a) => a.category?.id === cat.id)
               .slice(0, 4);
@@ -184,31 +186,34 @@ export default async function Home({ searchParams }: PageProps) {
             if (catArticles.length === 0) return null;
 
             return (
-              <div key={cat.id}>
-                <div className="flex justify-between mb-4">
-                  <h3 className="text-xl font-bold font-serif">
+              <div key={cat.id} className="border-t pt-8 first:border-0 first:pt-0">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-2xl font-bold font-serif uppercase tracking-tight text-slate-800 border-l-4 border-red-600 pl-3">
                     {cat.name}
                   </h3>
-                  <Link href={`/?category=${cat.slug}`}>
+                  <Link href={`/?category=${cat.slug}`} className="text-sm font-semibold text-red-600 hover:underline">
                     Voir plus →
                   </Link>
                 </div>
 
-                <div className="grid md:grid-cols-4 gap-4">
+                <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
                   {catArticles.map((article) => (
                     <Link key={article.id} href={`/articles/${article.slug}`}>
-                      <div>
-                        <div className="relative h-32 mb-2">
+                      <div className="group flex flex-col h-full bg-white border rounded-xl p-3 shadow-sm transition hover:shadow-md">
+                        <div className="relative h-36 mb-3 overflow-hidden rounded-lg bg-gray-100">
                           {getImage(article) && (
                             <Image
                               src={getImage(article)}
                               alt={article.title}
                               fill
-                              className="object-cover rounded"
+                              className="object-cover group-hover:scale-105 transition duration-300"
                             />
                           )}
                         </div>
-                        <h4 className="text-sm font-semibold">
+                        <span className="text-[11px] text-red-600 uppercase font-bold tracking-wide mb-1">
+                          {getCategoryLabel(article)}
+                        </span>
+                        <h4 className="text-sm font-bold text-gray-900 line-clamp-2 group-hover:text-red-600 transition mt-auto">
                           {article.title}
                         </h4>
                       </div>
