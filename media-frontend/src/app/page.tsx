@@ -82,15 +82,19 @@ export default async function Home({ searchParams }: PageProps) {
     breaking,
   });
 
-  // Requête asynchrone parallélisée incluant les filtres et les métadonnées de la page d'accueil d'origine
+  // Détection de la page d'accueil par défaut (Page 1, sans filtres actifs)
+  const isDefaultHome = page === 1 && !search && !categoryFilter;
+
+  // Requête asynchrone parallélisée incluant le tri chronologique explicite
   const [articlesData, featuredData, categoriesData, authorsData] = await Promise.all([
     getArticles({
       pagination: { page, pageSize },
       filters: Object.keys(filters).length > 0 ? filters : undefined,
+      sort: 'publishedAt:desc', // Assure un ordre chronologique strict du flux
     }),
     getArticles({
       filters: { featured: { $eq: true } },
-      sort: '-createdAt',
+      sort: 'publishedAt:desc', // Trie les vedettes par publication récente
       pagination: { page: 1, pageSize: 3 },
     }),
     getCategories(),
@@ -104,24 +108,35 @@ export default async function Home({ searchParams }: PageProps) {
   const total = (articlesData as any)?.meta?.pagination?.total || 0;
   const totalPages = Math.ceil(total / pageSize);
 
-  // Logique originelle de la Home pour l'Article Vedette
+  // Sécurisation de l'Article Vedette
   if (featuredArticles.length === 0 && articles.length > 0) {
     featuredArticles.push(articles[0]);
   }
 
-  const featuredIds = new Set<number>(featuredArticles.map((a) => a.id));
-  const threeCards = articles.filter((a) => !featuredIds.has(a.id)).slice(0, 3);
   const leadArticle = featuredArticles[0] || articles[0] || null;
   const leadImageUrl = leadArticle?.cover 
     ? (strapiImageUrlPrefer(leadArticle.cover, ['large', 'medium', 'small', 'thumbnail']) || "") 
     : "";
 
-  // Détection pour afficher la structure éditoriale complexe uniquement sur la page 1 non-filtrée
-  const isDefaultHome = page === 1 && !search && !categoryFilter;
+  // 1. Blocs "Derniers Décryptages" : On exclut uniquement l'article de tête principal pour éviter le doublon immédiat
+  const threeCards = articles
+    .filter((a) => a.id !== leadArticle?.id)
+    .slice(0, 3);
+
+  // 2. 🚀 Correction de la partie "Tout" : On retire de la grille uniquement ce qui est visible tout en haut (Une + Top 3)
+  // afin qu'aucun autre article featured ou récent ne disparaisse de l'écran.
+  const topDisplayedIds = new Set([
+    ...(leadArticle ? [leadArticle.id] : []),
+    ...threeCards.map((a) => a.id)
+  ]);
+
+  const gridArticles = isDefaultHome 
+    ? articles.filter((a) => !topDisplayedIds.has(a.id)) 
+    : articles;
 
   const getExcerpt = (article: Article & Record<string, any>) =>
     article.description || article.excerpt || article.summary || article.content ||
-    "Voici le résumé ou le premier paragraphe de votre article phare. Il donne envie de cliquer pour en savoir plus sur cette investigation ou cette analyse majeure.";
+    "Cliquez pour lire l'intégralité de cet article.";
 
   const getCategoryLabel = (article: Article) => article.category?.name || "Actualité";
 
@@ -162,7 +177,7 @@ export default async function Home({ searchParams }: PageProps) {
 
         {articles.length > 0 ? (
           <>
-            {/* VUE EDITEUR / UNE (Uniquement sur l'accueil par défaut) */}
+            {/* VUE EDITEUR / UNE */}
             {isDefaultHome ? (
               <>
                 <h2 className="text-xs font-bold uppercase tracking-widest text-red-600 mb-4">À la une</h2>
@@ -191,7 +206,7 @@ export default async function Home({ searchParams }: PageProps) {
                         {leadArticle ? getCategoryLabel(leadArticle) : "Actualité"}
                       </span>
                       <h2 className="text-2xl md:text-4xl font-extrabold mt-2 group-hover:text-red-600 transition leading-tight font-serif">
-                        {leadArticle?.title || 'Le grand titre de l\'article principal qui capte immédiatement l\'attention du lecteur'}
+                        {leadArticle?.title || 'Le grand titre de l\'article principal'}
                       </h2>
                       <p className="text-gray-600 mt-3 text-base md:text-lg line-clamp-3">
                         {leadArticle ? getExcerpt(leadArticle) : ""}
@@ -221,17 +236,17 @@ export default async function Home({ searchParams }: PageProps) {
                 </div>
               </>
             ) : (
-              /* FILTRAGE OU PAGE SUBSEQUENTE : Affichage direct sous forme de liste dynamique épurée */
               <div className="mb-8">
                 <h2 className="text-xl font-bold uppercase tracking-tight text-gray-600 mb-6">Publications trouvées</h2>
               </div>
             )}
 
-            {/* SECTIONS CONTENUS SUPPLÉMENTAIRES (Toujours disponibles ou alimentés par le flux filtré via HomeGrid) */}
+            {/* SECTION FACT-CHECKING */}
             <section className="factcheck-fullwidth py-4">
               <FactCheckPreview />
             </section>
 
+            {/* GRILLE PRINCIPALE DE FLUX */}
             <section className="py-8">
               <div className="mb-8 border-b border-gray-200 pb-4">
                 <h3 className="text-2xl font-black uppercase tracking-tight font-serif">
@@ -239,12 +254,11 @@ export default async function Home({ searchParams }: PageProps) {
                 </h3>
               </div>
               <div className="text-left text-gray-900">
-                {/* On passe tous les articles restants ou filtrés à la grille principale */}
-                <HomeGrid threeCards={isDefaultHome ? articles.filter((a) => !featuredIds.has(a.id)) : articles} />
+                <HomeGrid threeCards={gridArticles} />
               </div>
             </section>
 
-            {/* PAGINATION DE L'ACCUEIL UNIQUE */}
+            {/* PAGINATION */}
             <div className="mt-12 pt-8 border-t border-gray-200">
               <PaginationComponent
                 currentPage={page}
