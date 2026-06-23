@@ -72,7 +72,7 @@ export default async function Home({ searchParams }: PageProps) {
     </div>
   ) : (
     <div className="mb-4 text-xs italic text-gray-400 normal-case">
-      (Aucune catégorie reçue. Vérifie les permissions "Public -> find" pour les Categories dans l'admin Strapi)
+      (Aucune catégorie reçue. Vérifie les permissions Public et l'action find pour les Categories dans Strapi)
     </div>
   )}
 
