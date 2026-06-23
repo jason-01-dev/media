@@ -5,6 +5,7 @@ import Image from "next/image";
 import { strapiImageUrlPrefer } from "@/lib/image";
 import AdvancedSearchBar from "@/components/AdvancedSearchBar";
 import PaginationComponent from "@/components/PaginationComponent";
+import FeaturedSlider from "@/components/FeaturedSlider";
 
 export const metadata = {
   title: "Actu 24 | Votre plateforme d'information",
@@ -48,9 +49,9 @@ export default async function Home({ searchParams }: any) {
   const total = (articlesData as any)?.meta?.pagination?.total || 0;
   const totalPages = Math.ceil(total / pageSize);
 
-  const leadArticle = articles[0];
-  const topArticles = articles.slice(1, 4);
-  const mainArticles = articles.slice(4);
+  const featuredArticles = articles.slice(0, 5); // Alimente le carrousel
+  const topArticles = articles.slice(5, 8);      // Les 3 suivants
+   const mainArticles = articles.slice(8);       // Le reste pour le flux continu
 
   const getImage = (article: Article) =>
     strapiImageUrlPrefer(article.cover, ["large", "medium", "small"]) || "";
@@ -103,40 +104,18 @@ export default async function Home({ searchParams }: any) {
 
         <AdvancedSearchBar categories={categories} authors={authors} />
 
-        {/* HERO */}
-        {leadArticle && (
-          <section className="mb-12">
-            <Link href={`/articles/${leadArticle.slug}`}>
-              <div className="relative h-[420px] rounded-xl overflow-hidden group shadow-sm bg-gray-200">
-                {getImage(leadArticle) && (
-                  <Image
-                    src={getImage(leadArticle)}
-                    alt={leadArticle.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition duration-300"
-                    priority
-                  />
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-                <div className="absolute bottom-0 p-6 text-white max-w-3xl">
-                  <span className="text-xs bg-red-600 px-2 py-1 uppercase font-bold tracking-wider rounded-sm">
-                    À LA UNE
-                  </span>
-
-                  <h2 className="text-3xl md:text-4xl font-bold mt-3 leading-tight">
-                    {leadArticle.title}
-                  </h2>
-
-                  <p className="mt-2 text-gray-200 line-clamp-2 text-sm md:text-base">
-                    {getExcerpt(leadArticle)}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </section>
-        )}
+        {/* HERO SLIDER CARROUSEL DYNAMIQUE */}
+{featuredArticles.length > 0 && (
+  <section className="mb-12">
+    <FeaturedSlider 
+      featuredArticles={featuredArticles}
+      getImage={getImage}
+      getCategoryLabel={getCategoryLabel}
+      getExcerpt={getExcerpt}
+    />
+  </section>
+)}
+        
 
         {/* TOP ARTICLES */}
         <section className="grid md:grid-cols-3 gap-6 mb-12">
