@@ -104,14 +104,18 @@ export default async function Home({ searchParams }: any) {
 
         <AdvancedSearchBar categories={categories} authors={authors} />
 
-        {/* HERO SLIDER CARROUSEL DYNAMIQUE */}
+{/* HERO SLIDER CARROUSEL DYNAMIQUE */}
 {featuredArticles.length > 0 && (
   <section className="mb-12">
     <FeaturedSlider 
-      featuredArticles={featuredArticles}
-      getImage={getImage}
-      getCategoryLabel={getCategoryLabel}
-      getExcerpt={getExcerpt}
+      featuredArticles={featuredArticles.map((article) => ({
+        id: article.id,
+        slug: article.slug,
+        title: article.title,
+        coverUrl: getImage(article),
+        categoryLabel: getCategoryLabel(article),
+        excerpt: getExcerpt(article),
+      }))}
     />
   </section>
 )}
