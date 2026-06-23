@@ -61,8 +61,7 @@ function buildArticleFilters(params: {
 export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Number.parseInt(params?.page ?? "1", 10);
-  // Augmentation de la taille pour récupérer assez d'articles à distribuer par catégories sur la page d'accueil
-  const pageSize = 40; 
+  const pageSize = 20; // Nombre suffisant d'articles pour alimenter le flux global et les filtres
   const search = params?.search || "";
   const categoryFilter = params?.category || "";
   const categoriesFilter = params?.categories ? params.categories.split(",") : [];
@@ -120,6 +119,16 @@ export default async function Home({ searchParams }: PageProps) {
     .filter((a) => a.id !== leadArticle?.id)
     .slice(0, 3);
 
+  // Pour le flux principal global du bas, on évite de dupliquer ce qui est déjà dans la Une et les "Derniers Décryptages"
+  const topDisplayedIds = new Set([
+    ...(leadArticle ? [leadArticle.id] : []),
+    ...threeCards.map((a) => a.id)
+  ]);
+
+  const mainGridArticles = isDefaultHome 
+    ? articles.filter((a) => !topDisplayedIds.has(a.id)) 
+    : articles;
+
   const getExcerpt = (article: Article & Record<string, any>) =>
     article.description || article.excerpt || article.summary || article.content ||
     "Cliquez pour lire l'intégralité de cet article.";
@@ -163,7 +172,7 @@ export default async function Home({ searchParams }: PageProps) {
 
         {articles.length > 0 ? (
           <>
-            {/* VUE ZONE DE LA UNE (Uniquement sur l'accueil par défaut) */}
+            {/* VUE BLOC EDITO / UNE */}
             {isDefaultHome && (
               <>
                 <h2 className="text-xs font-bold uppercase tracking-widest text-red-600 mb-4">À la une</h2>
@@ -184,7 +193,6 @@ export default async function Home({ searchParams }: PageProps) {
                           <div className="w-full h-full bg-gray-300" />
                         )}
                       </div>
-                      {/* Nom de la catégorie bien visible sur la Une */}
                       <span className="text-sm font-semibold text-red-600 uppercase tracking-wider">
                         {leadArticle ? getCategoryLabel(leadArticle) : "Actualité"}
                       </span>
@@ -201,7 +209,6 @@ export default async function Home({ searchParams }: PageProps) {
                     <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-2">Derniers Décryptages</h3>
                     {threeCards.map((article: Article) => (
                       <article key={article.id} className="block group border-b border-gray-100 pb-4 last:border-0">
-                        {/* Nom de la catégorie marqué sur l'article */}
                         <span className="text-xs font-bold text-blue-600 uppercase">{getCategoryLabel(article)}</span>
                         <Link href={article.slug ? `/articles/${article.slug}` : '#'}>
                           <h4 className="font-bold text-lg mt-1 group-hover:text-red-600 transition leading-snug">
@@ -220,46 +227,46 @@ export default async function Home({ searchParams }: PageProps) {
               <FactCheckPreview />
             </section>
 
-            {/* GENERATION DYNAMIQUE DES CONTENUS PAR CATEGORIE (Mode Accueil) */}
-            {isDefaultHome ? (
-              categories.map((cat: any) => {
-                // Filtrage de tous les articles appartenant à cette catégorie spécifique (Ex: Innovation, Politique, etc.)
-                const categoryArticles = articles.filter(
-                  (art) => art.category?.id === cat.id || art.category?.slug === cat.slug
-                );
+            {/* 1️⃣ LA PARTIE PRINCIPALE GLOBALE ("TOUT") */}
+            <section className="py-8">
+              <div className="mb-8 border-b border-gray-200 pb-4">
+                <h3 className="text-2xl font-black uppercase tracking-tight font-serif text-slate-900">
+                  {isDefaultHome ? "Les Grands Titres du jour" : "Flux d'actualité continu"}
+                </h3>
+              </div>
+              <div className="text-left text-gray-900">
+                <HomeGrid threeCards={mainGridArticles} />
+              </div>
+            </section>
 
-                // Si aucune publication n'est présente dans cette catégorie parmi les données chargées, on ne rend pas la section vide
-                if (categoryArticles.length === 0) return null;
+            {/* 2️⃣ LES FOCUS SECTIONS PAR CATÉGORIES (Uniquement visibles sur l'accueil par défaut) */}
+            {isDefaultHome && categories.length > 0 && (
+              <div className="mt-12 pt-12 border-t border-gray-200 space-y-16">
+                {categories.map((cat: any) => {
+                  // On récupère les articles spécifiques à cette catégorie parmi la liste chargée
+                  const categoryArticles = articles.filter(
+                    (art) => art.category?.id === cat.id || art.category?.slug === cat.slug
+                  ).slice(0, 4); // On limite à 4 par exemple pour faire un joli "aperçu/carrousel" sous forme de grille
 
-                return (
-                  <section key={cat.id} className="py-8 border-b border-gray-200 last:border-none">
-                    <div className="flex justify-between items-end mb-6">
-                      <h3 className="text-2xl font-black uppercase tracking-tight font-serif text-slate-900 border-l-4 border-red-600 pl-3">
-                        {cat.name}
-                      </h3>
-                      <Link href={`/?category=${cat.slug}`} className="text-xs font-bold uppercase tracking-wider text-red-600 hover:underline">
-                        Voir tout {cat.name} &rarr;
-                      </Link>
-                    </div>
-                    {/* Le HomeGrid reçoit les articles filtrés pour cette catégorie */}
-                    <div className="text-left text-gray-900">
-                      <HomeGrid threeCards={categoryArticles} />
-                    </div>
-                  </section>
-                );
-              })
-            ) : (
-              /* AFFICHAGE EN CAS DE FILTRE ACTIF (Grille simple standard) */
-              <section className="py-8">
-                <div className="mb-6">
-                  <h3 className="text-2xl font-black uppercase tracking-tight font-serif">
-                    Résultats de filtrage continu
-                  </h3>
-                </div>
-                <div className="text-left text-gray-900">
-                  <HomeGrid threeCards={articles} />
-                </div>
-              </section>
+                  if (categoryArticles.length === 0) return null;
+
+                  return (
+                    <section key={cat.id} className="bg-white p-6 rounded-xl border border-gray-200/80 shadow-sm">
+                      <div className="flex justify-between items-end mb-6 border-b border-gray-100 pb-3">
+                        <h4 className="text-xl font-bold uppercase tracking-tight font-serif text-slate-900 border-l-4 border-red-600 pl-3">
+                          Focus : {cat.name}
+                        </h4>
+                        <Link href={`/?category=${cat.slug}`} className="text-xs font-bold uppercase tracking-wider text-red-600 hover:underline">
+                          Voir plus de contenus {cat.name} &rarr;
+                        </Link>
+                      </div>
+                      <div className="text-left text-gray-900">
+                        <HomeGrid threeCards={categoryArticles} />
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
             )}
 
             {/* PAGINATION */}
