@@ -11,15 +11,18 @@ export const metadata = {
 };
 
 type PageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
-  };
+  }>;
 };
 
 export default async function Home({ searchParams }: PageProps) {
-  const page = Number.parseInt(searchParams?.page ?? "1", 10);
+  // Attente obligatoire des searchParams pour Next.js Server Components
+  const params = await searchParams;
+  const page = Number.parseInt(params?.page ?? "1", 10);
   const pageSize = 20;
 
+  // Récupération stable de toutes les données en parallèle
   const [articlesData, categoriesData, authorsData] = await Promise.all([
     getArticles({
       pagination: { page, pageSize },
@@ -50,36 +53,34 @@ export default async function Home({ searchParams }: PageProps) {
     article.category?.name || "Actualité";
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen text-gray-900">
       <main className="max-w-7xl mx-auto px-4 md:px-6 py-8">
 
-        {/* HEADER */}
-<div className="mb-10 border-b pb-6">
-  
-  {/* Liste horizontale des catégories de Strapi */}
-  {categories && categories.length > 0 ? (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-bold uppercase tracking-widest text-red-600">
-      {categories.map((cat: any, index: number) => (
-        <div key={cat.id || cat.documentId || index} className="flex items-center">
-          <Link href={`/?category=${cat.slug}`} className="hover:text-slate-900 transition hover:underline">
-            {cat.name}
-          </Link>
-          {index < categories.length - 1 && (
-            <span className="ml-4 text-gray-300 font-normal select-none">•</span>
+        {/* HEADER COHÉRENT ET SÉCURISÉ */}
+        <div className="mb-10 border-b pb-6">
+          
+          {/* Liste des catégories affichée proprement juste au-dessus du titre */}
+          {categories && categories.length > 0 && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-bold uppercase tracking-widest text-red-600">
+              {categories.map((cat: any, index: number) => (
+                <div key={cat.id || index} className="flex items-center">
+                  <Link href={`/?category=${cat.slug}`} className="hover:text-slate-900 transition hover:underline">
+                    {cat.name}
+                  </Link>
+                  {index < categories.length - 1 && (
+                    <span className="ml-4 text-gray-300 font-normal select-none">•</span>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
-        </div>
-      ))}
-    </div>
-  ) : (
-    <div className="mb-4 text-xs italic text-gray-400 normal-case">
-      (Aucune catégorie reçue. Vérifie les permissions Public et l'action find pour les Categories dans Strapi)
-    </div>
-  )}
 
-  <h1 className="text-4xl md:text-5xl font-black font-serif text-slate-900">
-    L'Information Décryptée
-  </h1>
-</div>
+          <h1 className="text-4xl md:text-5xl font-black font-serif">
+            L'Information Décryptée
+          </h1>
+        </div>
+
+        <AdvancedSearchBar categories={categories} authors={authors} />
 
         {/* HERO */}
         {leadArticle && (
