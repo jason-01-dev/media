@@ -501,3 +501,90 @@
     margin-top: 32px;
   }
 }
+.related-sidebar .sidebar-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #000000;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.01em;
+}
+
+/* Liste des articles */
+.sidebar-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Conteneur d'un article (Ligne : Image + Texte) */
+.sidebar-article-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-decoration: none !important;
+  color: inherit;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-article-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sidebar-article-card:hover {
+  opacity: 0.85;
+}
+
+/* Bloc de l'image miniature à gauche */
+.sidebar-article-image {
+  position: relative;
+  width: 80px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+}
+
+.sidebar-article-image .object-cover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Bloc du texte à droite de la photo */
+.sidebar-article-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Le titre de l'article */
+.sidebar-article-body h4 {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #1a1a1a;
+  margin: 0;
+  /* Coupe proprement le texte sur 3 lignes max si c'est trop long */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Changement de couleur uniquement au survol du bloc complet */
+.sidebar-article-card:hover .sidebar-article-body h4 {
+  color: #c1121f;
+}
+
+/* Petite date grise sous le titre */
+.sidebar-article-date {
+  font-size: 11px;
+  color: #888888;
+  font-weight: 500;
+  margin: 0;
+  text-transform: capitalize;
+}
