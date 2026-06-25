@@ -588,3 +588,58 @@
   margin: 0;
   text-transform: capitalize;
 } 
+
+.fact-check-streaming-container {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* On cible de force les paragraphes de texte qui débordent du composant */
+.fact-check-streaming-container p, 
+.fact-check-streaming-container .description,
+.fact-check-streaming-container .body {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: #94a3b8 !important; /* Gris doux pour le texte secondaire */
+  margin-top: 6px !important;
+  
+  /* Sécurité absolue : on coupe le texte à 2 lignes maximum */
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Formatage des titres du fact-check dans le flux */
+.fact-check-streaming-container h3,
+.fact-check-streaming-container h4 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  margin: 0 !important;
+  line-clamp: 1 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 1 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* Si ton composant utilise des liens ou des cartes internes */
+.fact-check-streaming-container a {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 12px !important;
+  background-color: #1e293b !important; /* Fond ardoise style streaming */
+  border-radius: 12px !important;
+  border: 1px solid #334155 !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.fact-check-streaming-container a:hover {
+  background-color: #334155 !important;
+  border-color: #475569 !important;
+}
