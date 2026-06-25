@@ -191,14 +191,34 @@ export default async function Home({ searchParams }: PageProps) {
             </section>
           )}
 
-          {/* FACT CHECK */}
-          <section className="w-screen relative left-1/2 -ml-[50vw] my-16" aria-label="Vérification des faits">
-            <div className="bg-white border-y py-10 shadow-sm">
-              <div className="max-w-7xl mx-auto px-4 md:px-6">
-                <FactCheckPreview />
-              </div>
-            </div>
-          </section>
+          {/* SECTION FACT-CHECK STYLE FIL D'ACTUALITÉ / STREAMING */}
+<section className="mb-14 bg-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-xl border border-slate-800" aria-label="Zone de vérification des faits en direct">
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-4">
+    <div>
+      <div className="flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+        <span className="text-xs font-bold uppercase tracking-widest text-red-400">
+          Fact-Checking en direct
+        </span>
+      </div>
+      <h2 className="text-2xl font-black font-serif mt-1 text-white">
+        Le Vrai du Faux
+      </h2>
+    </div>
+    
+    <Link 
+      href="/fact-checks" 
+      className="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl transition-all duration-200"
+    >
+      Voir tout le flux →
+    </Link>
+  </div>
+
+  {/* Conteneur fluide et sécurisé pour le streaming de fact-checks */}
+  <div className="fact-check-streaming-container grid gap-4">
+    <FactCheckPreview />
+  </div>
+</section>
 
           {/* MAIN FEED (FLUX CONTINU) */}
           {mainArticles.length > 0 && (
