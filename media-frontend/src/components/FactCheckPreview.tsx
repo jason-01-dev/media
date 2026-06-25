@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getFactChecks } from "@/lib/strapi";
-import { parseMarkdownToHtml } from "@/lib/markdown";
 
 interface Claim {
   id: number;
@@ -15,15 +14,15 @@ interface Claim {
 }
 
 function getFactCheckVerdictLabel(verdict: Claim['verdict']) {
-  if (verdict === 'verified') {
-    return 'Vérifié';
-  }
-
-  if (verdict === 'disputed') {
-    return 'Contesté';
-  }
-
+  if (verdict === 'verified') return 'Vérifié';
+  if (verdict === 'disputed') return 'Contesté';
   return 'Faux';
+}
+
+function getVerdictColorClass(verdict: Claim['verdict']) {
+  if (verdict === 'verified') return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+  if (verdict === 'disputed') return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+  return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
 }
 
 export default function FactCheckPreview() {
@@ -56,78 +55,54 @@ export default function FactCheckPreview() {
     if (claims.length <= 1) return;
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % claims.length);
-    }, 7000);
+    }, 6000); // Aligné à 6 secondes pour un effet streaming dynamique
 
     return () => clearInterval(timer);
   }, [claims.length]);
 
-  const activeClaim = claims[activeIndex] || null;
-
   if (claims.length === 0) {
     return (
-      <section className="factcheck-section" aria-labelledby="factcheck-title">
-        <div className="w-full px-4 md:px-6 py-16">
-          <div className="factcheck-header">
-            <h2 id="factcheck-title">Fact-Check</h2>
-            <p className="muted">Aucune vérification disponible pour le moment. Vérifiez votre connexion ou la configuration de Strapi.</p>
-          </div>
-          <div className="factcheck-empty">
-            <p>Les vérifications dynamiques apparaîtront ici dès que les données seront accessibles.</p>
-            <Link href="/fact-check" className="btn-secondary mt-4">
-              Voir la base de vérifications →
-            </Link>
-          </div>
-        </div>
-      </section>
+      <div className="text-slate-400 text-sm italic p-4 text-center">
+        Aucune vérification en direct disponible.
+      </div>
     );
   }
 
   return (
-    <section className="factcheck-section" aria-labelledby="factcheck-title">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
-        <div className="factcheck-header">
-          <h2 id="factcheck-title">Fact-Check</h2>
-          <p className="muted">Vérifiez rapidement des affirmations et consultez nos vérifications dynamiques.</p>
-        </div>
-
-        {activeClaim && (
-          <article className="factcheck-featured-card">
-            <div className="factcheck-featured-badge">Actualité vérifiée</div>
-            <h3>{activeClaim.claim}</h3>
-            <div className="factcheck-featured-meta">
-              <span className={`factcheck-verdict verdict-${activeClaim.verdict}`}>
-                {getFactCheckVerdictLabel(activeClaim.verdict)}
-              </span>
-              {activeClaim.source && <span className="factcheck-source">Source: {activeClaim.source}</span>}
-            </div>
-            {activeClaim.body && (
-              <div className="richtext-content" dangerouslySetInnerHTML={{ __html: parseMarkdownToHtml(activeClaim.body) }} />
-            )}
-          </article>
-        )}
-
-        <div className="factcheck-list" style={{ marginTop: 24 }}>
-          {claims.map((c, index) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              className={`factcheck-mini-card ${index === activeIndex ? 'active' : ''}`}
-            >
-              <span className="factcheck-mini-title">{c.claim}</span>
-              <span className={`factcheck-mini-verdict verdict-${c.verdict}`}>
+    <div className="w-full space-y-3">
+      {claims.map((c, index) => {
+        const isActive = index === activeIndex;
+        
+        return (
+          <div
+            key={c.id}
+            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border transition-all duration-500 ${
+              isActive 
+                ? 'bg-slate-800 border-slate-700 shadow-md translate-x-1' 
+                : 'bg-slate-900/40 border-slate-800/60 opacity-40 hover:opacity-70'
+            }`}
+          >
+            <div className="flex items-start gap-3 min-w-0">
+              {/* Badge d'état streaming dynamique */}
+              <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded border shrink-0 mt-0.5 ${getVerdictColorClass(c.verdict)}`}>
                 {getFactCheckVerdictLabel(c.verdict)}
               </span>
-            </button>
-          ))}
-        </div>
+              
+              {/* Affirmation (Bridée strictement sur une seule ligne pour le streaming) */}
+              <h4 className="text-sm font-bold text-slate-100 line-clamp-1 min-w-0 leading-tight">
+                {c.claim}
+              </h4>
+            </div>
 
-        <div style={{ marginTop: 24, textAlign: 'center' }}>
-          <Link href="/fact-check" className="btn-primary">
-            Voir la base de vérifications →
-          </Link>
-        </div>
-      </div>
-    </section>
+            {/* Source de l'affirmation à droite */}
+            {c.source && (
+              <span className="text-[11px] text-slate-400 font-medium shrink-0 bg-slate-950/40 px-2 py-0.5 rounded border border-slate-800/40">
+                Source: {c.source}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
