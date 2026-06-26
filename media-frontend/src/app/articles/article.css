@@ -1,7 +1,83 @@
-@media (min-width: 1024px) {
-  .main-layout {
-    /* Au lieu de 1fr 320px, on lui dit de faire une seule colonne pleine largeur */
-    grid-template-columns: 1fr; 
-    gap: 40px;
-  }
+/* ==========================================================================
+   Mise en page des articles secondaires (Sidebar / Listes)
+   ========================================================================== */
+
+/* Conteneur de la liste des articles */
+.sidebar-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Une ligne d'article : Image à gauche + Texte à droite */
+.sidebar-article-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-decoration: none !important;
+  color: inherit;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-article-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.sidebar-article-card:hover {
+  opacity: 0.85;
+}
+
+/* Bloc miniature de la photo à gauche */
+.sidebar-article-image {
+  position: relative;
+  width: 80px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+}
+
+.sidebar-article-image img,
+.sidebar-article-image .object-cover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Bloc texte à droite */
+.sidebar-article-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Titre de l'article bridé sur 3 lignes max */
+.sidebar-article-body h4 {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #1a1a1a;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Changement de couleur rouge au survol */
+.sidebar-article-card:hover .sidebar-article-body h4 {
+  color: #c1121f;
+}
+
+/* Petite date ou source sous le titre */
+.sidebar-article-date {
+  font-size: 11px;
+  color: #888888;
+  font-weight: 500;
+  margin: 0;
+  text-transform: capitalize;
 }
