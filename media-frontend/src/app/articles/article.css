@@ -401,9 +401,10 @@
 }
 
 /* Chaque ligne d'article dans la sidebar */
-.secondary-sidebar a, 
-.related-article-item,
-.sidebar-article-card {
+.secondary-sidebar .suggestion-item-card,
+.secondary-sidebar .related-article-item,
+.secondary-sidebar .sidebar-article-card,
+.secondary-sidebar a[href*="/articles/"] {
   display: flex !important;
   flex-direction: row !important; /* Force l'alignement horizontal */
   align-items: flex-start;
@@ -414,6 +415,7 @@
   border-bottom: 1px solid #f3f4f6;
   transition: opacity 0.2s ease;
 }
+
 
 .secondary-sidebar a:last-child,
 .related-article-item:last-child {
