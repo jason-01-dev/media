@@ -367,3 +367,120 @@
 .suggestion-item-card:hover h4 {
   color: #c1121f;
 }
+
+.breadcrumb-section .content-container {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Si ton composant Breadcrumbs génère des liens et séparateurs */
+.breadcrumb-section a {
+  color: #111827;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.breadcrumb-section a:hover {
+  color: #c1121f;
+}
+
+
+/* ==========================================================================
+   CORRECTION : SIDEBAR (IMAGE À GAUCHE, DONNÉES À DROITE)
+   ========================================================================== */
+
+/* Conteneur global de la sidebar ou liste reçue par RelatedArticlesSidebar */
+.sticky-sidebar-container,
+.secondary-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Chaque ligne d'article dans la sidebar */
+.secondary-sidebar a, 
+.related-article-item,
+.sidebar-article-card {
+  display: flex !important;
+  flex-direction: row !important; /* Force l'alignement horizontal */
+  align-items: flex-start;
+  gap: 12px;
+  text-decoration: none !important;
+  color: inherit;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: opacity 0.2s ease;
+}
+
+.secondary-sidebar a:last-child,
+.related-article-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.secondary-sidebar a:hover {
+  opacity: 0.85;
+}
+
+/* Le bloc contenant l'image à gauche */
+.secondary-sidebar .card-media-wrapper,
+.secondary-sidebar .image-container,
+.sidebar-article-image {
+  position: relative;
+  width: 90px !important;    /* Largeur fixe de la miniature */
+  height: 64px !important;   /* Hauteur fixe de la miniature */
+  flex-shrink: 0;            /* Empêche l'image de se déformer ou s'écraser */
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+  margin: 0 !important;      /* Annule les marges extérieures */
+}
+
+.secondary-sidebar img {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Le bloc contenant le texte/données à droite de la photo */
+.secondary-sidebar .card-info-content,
+.secondary-sidebar .text-container,
+.sidebar-article-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;                   /* Prend tout l'espace restant à droite */
+  min-width: 0;              /* Évite les bugs de débordement de texte */
+}
+
+/* Titre de l'article dans la sidebar */
+.secondary-sidebar h4,
+.secondary-sidebar .article-title {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  color: #1a1a1a;
+  margin: 0 !important;
+  /* Limite le titre à 2 ou 3 lignes proprement */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.secondary-sidebar a:hover h4 {
+  color: #c1121f !important;
+}
+
+/* Date, catégorie ou stats sous le titre à droite */
+.secondary-sidebar .meta-info,
+.secondary-sidebar .article-date,
+.sidebar-article-date {
+  font-size: 11px;
+  color: #888888;
+  font-weight: 500;
+  margin: 0;
+}
