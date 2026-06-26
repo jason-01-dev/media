@@ -400,7 +400,7 @@
   gap: 20px;
 }
 
-/* Chaque ligne d'article dans la sidebar */
+/* Chaque ligne d'article dans la sidebar : Alignement horizontal forcé */
 .secondary-sidebar .suggestion-item-card,
 .secondary-sidebar .related-article-item,
 .secondary-sidebar .sidebar-article-card,
@@ -416,14 +416,20 @@
   transition: opacity 0.2s ease;
 }
 
-
-.secondary-sidebar a:last-child,
-.related-article-item:last-child {
+/* Gestion du dernier élément de la liste */
+.secondary-sidebar .suggestion-item-card:last-child,
+.secondary-sidebar .related-article-item:last-child,
+.secondary-sidebar .sidebar-article-card:last-child,
+.secondary-sidebar a[href*="/articles/"]:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-.secondary-sidebar a:hover {
+/* Effet au survol de la carte d'article */
+.secondary-sidebar .suggestion-item-card:hover,
+.secondary-sidebar .related-article-item:hover,
+.secondary-sidebar .sidebar-article-card:hover,
+.secondary-sidebar a[href*="/articles/"]:hover {
   opacity: 0.85;
 }
 
@@ -434,7 +440,7 @@
   position: relative;
   width: 90px !important;    /* Largeur fixe de la miniature */
   height: 64px !important;   /* Hauteur fixe de la miniature */
-  flex-shrink: 0;            /* Empêche l'image de se déformer ou s'écraser */
+  flex-shrink: 0;            /* Empêche l'image de s'écraser */
   border-radius: 6px;
   overflow: hidden;
   background-color: #f3f4f6;
@@ -466,14 +472,18 @@
   line-height: 1.4 !important;
   color: #1a1a1a;
   margin: 0 !important;
-  /* Limite le titre à 2 ou 3 lignes proprement */
+  /* Limite le titre à 3 lignes proprement */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.secondary-sidebar a:hover h4 {
+/* Changement de couleur du titre au survol de sa carte parente */
+.secondary-sidebar .suggestion-item-card:hover h4,
+.secondary-sidebar .related-article-item:hover h4,
+.secondary-sidebar .sidebar-article-card:hover h4,
+.secondary-sidebar a[href*="/articles/"]:hover h4 {
   color: #c1121f !important;
 }
 
