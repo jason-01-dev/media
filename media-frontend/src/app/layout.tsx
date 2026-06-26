@@ -7,6 +7,7 @@ import { FaBroadcastTower } from "react-icons/fa";
 import Header from "@/components/Header";
 import "./globals.css";
 import "./styles/container.css";
+import "./article.css";
 import "./articles-responsive.css";
 import "./articles-layout.css";
 import "./highlight-sections.css";
