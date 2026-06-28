@@ -89,38 +89,39 @@ export default async function RootLayout({
 
         <ServiceWorkerRegister />
 
-        <footer className="border-t border-slate-200 bg-white py-10 mt-16 text-sm">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8">
+        <footer className="site-footer">
+          <div className="container footer-grid">
             <div>
-              <div className="font-serif font-bold text-xl tracking-tighter mb-2">Actu 24</div>
-              <p className="text-slate-600">L’information décryptée.<br />Indépendance • Rigueur • Transparence.</p>
+              <h4 className="footer-logo"><span className="logo-icon">📰</span> Actu 24</h4>
+              <p>Votre source d'information fiable et quotidienne. Retrouvez les meilleures actualités.</p>
             </div>
             <div>
-              <div className="font-semibold mb-2.5 text-slate-900">Navigation</div>
-              <ul className="space-y-1 text-slate-600">
+              <h5>Navigation</h5>
+              <ul>
                 <li><Link href="/">Accueil</Link></li>
-                <li><Link href="/articles">Toute l’actualité</Link></li>
-                <li><Link href="/fact-check">Fact-checking</Link></li>
+                <li><Link href="/articles">Articles</Link></li>
                 <li><Link href="/about">À propos</Link></li>
+                <li><Link href="#">Contact</Link></li>
               </ul>
             </div>
             <div>
-              <div className="font-semibold mb-2.5 text-slate-900">Sections</div>
-              <ul className="space-y-1 text-slate-600">
-                <li>Politique</li>
-                <li>Économie</li>
-                <li>Société</li>
-                <li>International</li>
+              <h5>Légal</h5>
+              <ul>
+                <li><Link href="#">Mentions légales</Link></li>
+                <li><Link href="#">Confidentialité</Link></li>
+                <li><Link href="#">Conditions d'utilisation</Link></li>
+                <li><Link href="#">Cookies</Link></li>
               </ul>
             </div>
             <div>
-              <div className="font-semibold mb-2.5 text-slate-900">Contact &amp; Légal</div>
-              <div className="text-slate-600 space-y-1">
-                <p>contact@actu24.fr</p>
-                <p className="text-xs mt-4">© {new Date().getFullYear()} Actu 24 — Tous droits réservés.</p>
-                <div className="text-[11px] text-slate-400 mt-1">Propulsé par Strapi &amp; Next.js</div>
-              </div>
+              <h5>Contact</h5>
+              <p>📧 contact@actu24.fr</p>
+              <p>📱 +33 (0) 1 XX XX XX XX</p>
+              <p className="social">Facebook • Twitter • LinkedIn</p>
             </div>
+          </div>
+          <div className="container copyright">
+            © 2026 Actu 24. Tous droits réservés. | Powered by Strapi & Next.js
           </div>
         </footer>
       </body>

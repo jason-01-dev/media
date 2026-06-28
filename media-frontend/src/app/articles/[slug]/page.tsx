@@ -109,7 +109,7 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
         </div>
       </div>
 
-      <main className="content-container main-layout">
+      <main className="main-layout" style={{ maxWidth: '100%', margin: '0 auto', paddingLeft: '20px', paddingRight: '20px' }}>
         <div className="primary-content">
           
           {/* Titre & Méta en tête (Style Journal Épuré) */}
