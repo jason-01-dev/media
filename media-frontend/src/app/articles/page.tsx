@@ -112,7 +112,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
   const articles: ArticleData[] = articlesData?.data || [];
   const categories = categoriesData?.data || [];
   const authors = authorsData?.data || [];
-  const total = (articlesData as any)?.meta?.pagination?.total || 0;
+  const total = (articlesData as { meta?: { pagination?: { total?: number } } })?.meta?.pagination?.total || 0;
   const totalPages = Math.ceil(total / pageSize);
 
   // Vérification stricte pour l'affichage de la mise en page Magazine
@@ -144,18 +144,15 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
 
         <AdvancedSearchBar categories={categories} authors={authors} />
 
-        {/* FILTRES DE CATÉGORIES STYLISÉS EN TABS MÉDIAS */}
+        {/* FILTRES DE CATÉGORIES — Pro style */}
         {categories.length > 0 && (
-          <div className="flex items-center gap-3 my-8 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200/60" aria-label="Catégories">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap">Sections :</span>
-            <Link href="/articles" className={`text-sm font-bold uppercase tracking-wider px-3 py-1 transition ${!categoryFilter ? 'text-red-600 border-b-2 border-red-600' : 'text-slate-600 hover:text-slate-900'}`}>
-              Tout
-            </Link>
+          <div className="flex items-center gap-x-4 overflow-x-auto pb-3 border-b border-slate-100 text-sm my-6 font-medium" aria-label="Catégories">
+            <Link href="/articles" className={`whitespace-nowrap transition hover:text-red-700 ${!categoryFilter ? 'text-red-700 font-semibold' : 'text-slate-600'}`}>Tout</Link>
             {categories.map((c: any) => (
               <Link
                 key={c.id}
                 href={`/articles?category=${c.slug}`}
-                className={`text-sm font-bold uppercase tracking-wider px-3 py-1 transition whitespace-nowrap ${categoryFilter === c.slug ? 'text-red-600 border-b-2 border-red-600' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`whitespace-nowrap transition hover:text-red-700 ${categoryFilter === c.slug ? 'text-red-700 font-semibold' : 'text-slate-600'}`}
               >
                 {c.name}
               </Link>
@@ -169,39 +166,34 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
             {isFirstPage && mainHeroArticle && (
               <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12" aria-label="À la une">
                 {/* Grand article vedette */}
-                <div className="lg:col-span-2 group relative flex flex-col justify-between bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition duration-300">
-                  <Link href={`/articles/${mainHeroArticle.slug}`} className="block relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
+                <div className="lg:col-span-2 group overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition hover:shadow-xl">
+                  <Link href={`/articles/${mainHeroArticle.slug}`} className="block relative aspect-[16/9.5] lg:aspect-[16/9] w-full overflow-hidden bg-slate-100">
                     {mainHeroCoverUrl ? (
                       <Image
                         src={mainHeroCoverUrl}
                         alt={mainHeroArticle.cover?.alternativeText || mainHeroArticle.title}
                         fill
-                        className="object-cover group-hover:scale-[1.02] transition duration-500"
+                        className="object-cover transition duration-700 group-hover:scale-[1.025]"
                         priority
                       />
                     ) : (
-                      <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400">Pas d'image</div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-slate-100 text-slate-400">Pas d’image</div>
                     )}
                     {mainHeroArticle.category && (
-                      <span className="absolute top-4 left-4 bg-red-600 text-white font-bold text-xs uppercase tracking-widest px-3 py-1 rounded shadow-sm">
-                        {mainHeroArticle.category.name}
-                      </span>
+                      <span className="absolute top-5 left-5 bg-red-600 text-white text-xs font-bold tracking-[1px] px-3 py-px rounded">{mainHeroArticle.category.name}</span>
                     )}
                   </Link>
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    <div>
-                      <Link href={`/articles/${mainHeroArticle.slug}`}>
-                        <h2 className="font-serif text-2xl md:text-3xl font-black text-slate-900 tracking-tight hover:text-red-600 transition mb-3">
-                          {mainHeroArticle.title}
-                        </h2>
-                      </Link>
-                      <p className="text-slate-600 text-base line-clamp-3 mb-6">
-                        {mainHeroArticle.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-slate-400 border-t border-slate-100 pt-4">
-                      <span className="text-slate-700">{mainHeroArticle.author?.name || "Rédaction"}</span>
-                      <span>•</span>
+                  <div className="p-7">
+                    <Link href={`/articles/${mainHeroArticle.slug}`}>
+                      <h2 className="font-serif text-[26px] lg:text-3xl leading-tight tracking-[-0.5px] font-semibold text-slate-950 hover:text-red-700 transition">
+                        {mainHeroArticle.title}
+                      </h2>
+                    </Link>
+                    <p className="mt-3 text-[15px] text-slate-600 line-clamp-3">{mainHeroArticle.description}</p>
+                    
+                    <div className="mt-5 text-xs text-slate-500 flex gap-2 font-medium">
+                      <span>{mainHeroArticle.author?.name || "Rédaction"}</span>
+                      <span className="text-slate-300">•</span>
                       <span>{new Date(mainHeroArticle.publishedAt).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}</span>
                     </div>
                   </div>
@@ -288,41 +280,38 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                     : "";
 
                   return (
-                    <article key={article.id} className="bg-white border border-slate-200/80 rounded-lg overflow-hidden flex flex-col justify-between group hover:border-slate-300 transition duration-200">
-                      <div>
-                        <Link href={`/articles/${article.slug}`} className="block relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
-                          {coverUrl ? (
-                            <Image
-                              src={coverUrl}
-                              alt={article.title}
-                              fill
-                              sizes="(max-width: 768px) 100vw, 33vw"
-                              className="object-cover group-hover:scale-[1.01] transition duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-300 text-xs uppercase font-bold tracking-wider">Pas d'image</div>
-                          )}
+                    <article key={article.id} className="group bg-white rounded-2xl border border-slate-100 overflow-hidden flex flex-col hover:border-slate-200 transition shadow-sm hover:shadow-md">
+                      <Link href={`/articles/${article.slug}`} className="block relative aspect-video bg-slate-100">
+                        {coverUrl ? (
+                          <Image
+                            src={coverUrl}
+                            alt={article.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 420px"
+                            className="object-cover transition group-hover:scale-[1.035]"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-slate-100 text-xs text-slate-400">Pas d’image</div>
+                        )}
+                      </Link>
+                      <div className="p-5 flex flex-col flex-1">
+                        {article.category && (
+                          <span className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-red-600 mb-1.5">
+                            {article.category.name}
+                          </span>
+                        )}
+                        <Link href={`/articles/${article.slug}`}>
+                          <h4 className="font-serif font-semibold text-[17px] leading-tight tracking-[-0.15px] text-slate-900 group-hover:text-red-700 transition line-clamp-3">
+                            {article.title}
+                          </h4>
                         </Link>
-                        <div className="p-5">
-                          {article.category && (
-                            <span className="text-[11px] font-black uppercase tracking-widest text-red-600 block mb-2">
-                              {article.category.name}
-                            </span>
-                          )}
-                          <Link href={`/articles/${article.slug}`}>
-                            <h4 className="font-serif font-bold text-lg text-slate-900 tracking-tight leading-snug group-hover:text-red-600 transition mb-2 line-clamp-2">
-                              {article.title}
-                            </h4>
-                          </Link>
-                          <p className="text-slate-500 text-sm line-clamp-2 mb-4 font-normal">
-                            {article.description}
-                          </p>
+                        {article.description && (
+                          <p className="mt-auto pt-3 text-sm text-slate-600 line-clamp-2">{article.description}</p>
+                        )}
+                        <div className="mt-4 pt-4 border-t text-xs text-slate-500 flex items-center justify-between font-medium">
+                          <span>{article.author?.name || "Rédaction"}</span>
+                          <span>{new Date(article.publishedAt).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}</span>
                         </div>
-                      </div>
-                      
-                      <div className="px-5 pb-5 pt-3 border-t border-slate-50 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                        <span className="text-slate-600">{article.author?.name || "Rédaction"}</span>
-                        <span>{new Date(article.publishedAt).toLocaleDateString("fr-FR", { day: 'numeric', month: 'short' })}</span>
                       </div>
                     </article>
                   );

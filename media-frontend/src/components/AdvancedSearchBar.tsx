@@ -71,10 +71,10 @@ export default function AdvancedSearchBar({ categories, authors }: AdvancedSearc
     <div className="advanced-search-wrapper mb-8">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="advanced-search-toggle"
+        className="advanced-search-toggle inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50 active:bg-slate-100"
       >
-        {isOpen ? '▼' : '▶'} Recherche avancée
-        {hasActiveFilters && <span className="filter-badge">{[selectedAuthors.length, selectedCategories.length, (dateFrom ? 1 : 0), (dateTo ? 1 : 0), urgent ? 1 : 0, breaking ? 1 : 0].reduce((a, b) => a + b)} filtres</span>}
+        {isOpen ? 'Masquer' : 'Recherche avancée'} 
+        {hasActiveFilters && <span className="ml-1 rounded bg-red-100 px-1.5 py-px text-[10px] font-bold text-red-600">{[selectedAuthors.length, selectedCategories.length, (dateFrom ? 1 : 0), (dateTo ? 1 : 0), urgent ? 1 : 0, breaking ? 1 : 0].reduce((a, b) => a + b)} filtres actifs</span>}
       </button>
 
       {isOpen && (
@@ -154,7 +154,7 @@ export default function AdvancedSearchBar({ categories, authors }: AdvancedSearc
                   checked={breaking}
                   onChange={(e) => setBreaking(e.target.checked)}
                 />
-                ⚡ Últimas noticias
+                ⚡ Articles en direct / Breaking
               </label>
             </div>
           </fieldset>

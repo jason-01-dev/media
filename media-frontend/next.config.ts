@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   images: {
-    unoptimized: true, // Allow unoptimized images for localhost development
+    // Removed unoptimized: true to enable Next.js image optimization for production
+    // Strapi images are optimized via remote patterns + Next Image
     remotePatterns: [
       {
         // 🌐 AJOUT POUR LA PRODUCTION : Autoriser les images de ton Strapi sur Render

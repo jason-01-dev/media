@@ -250,18 +250,17 @@ function getCurrentHost(): string | undefined {
 async function fetchStrapi<T>(path: string, options?: QueryOptions): Promise<T | null> {
   const base = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
   const token = process.env.NEXT_PUBLIC_STRAPI_TOKEN;
-  let fullUrlString = ''; // Déclarée ici pour être accessible aussi dans le catch
+  let fullUrlString = '';
 
   try {
     fullUrlString = buildStrapiUrl(base, path, options);
     const headers = buildStrapiHeaders(token);
 
-    console.log('🌐 Fetching from:', fullUrlString);
     const res = await fetch(fullUrlString, {
       method: 'GET',
       headers,
+      next: { revalidate: 60 }, // Consistent ISR-friendly caching
     });
-    console.log('📡 Response status:', res.status);
 
     if (!res.ok) {
       if (res.status === 404) {
@@ -273,17 +272,10 @@ async function fetchStrapi<T>(path: string, options?: QueryOptions): Promise<T |
     const payload = await res.json();
     return payload as T;
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    console.error('❌ Strapi fetch error:', errorMessage);
-    console.error('❌ Full error:', err);
-
-    const currentHost = getCurrentHost();
-    if (currentHost) {
-      console.error('🌍 Attempted URL:', base);
-      console.error('📍 Current hostname:', currentHost);
-      console.error('🔗 Full constructed URL:', fullUrlString || 'URL non construite');
+    // Silent in production - errors are handled gracefully by UI
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Strapi] Fetch error for', fullUrlString, err);
     }
-
     return null;
   }
 }

@@ -40,15 +40,25 @@ export async function generateMetadata(): Promise<Metadata> {
     const global = globalData?.data;
 
     return {
-      title: global?.siteName || "Media CMS",
-      description: global?.siteDescription || "Strapi Media CMS",
-      metadataBase: new URL(process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"),
+      title: {
+        default: global?.siteName || "Actu 24 | L'Information Décryptée",
+        template: "%s | Actu 24",
+      },
+      description: global?.siteDescription || "Actu 24 — Votre source d'actualité fiable, analyses et vérification des faits en temps réel.",
+      metadataBase: new URL("https://actu24.example.com"), // Change to your real domain in production
+      icons: {
+        icon: "/favicon.ico",
+      },
+      alternates: {
+        languages: {
+          'fr-FR': '/',
+        },
+      },
     };
   } catch (err) {
     return {
-      title: "Media CMS",
-      description: "Strapi Media CMS",
-      metadataBase: new URL(process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"),
+      title: "Actu 24 | L'Information Décryptée",
+      description: "Actualité, analyses et fact-checking en continu.",
     };
   }
 }
@@ -62,7 +72,7 @@ export default async function RootLayout({
   const categories = categoriesData?.data || [];
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0B2540" />
@@ -79,39 +89,38 @@ export default async function RootLayout({
 
         <ServiceWorkerRegister />
 
-        <footer className="site-footer">
-          <div className="container footer-grid">
+        <footer className="border-t border-slate-200 bg-white py-10 mt-16 text-sm">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8">
             <div>
-              <h4 className="footer-logo"><span className="logo-icon">📰</span> Actu 24</h4>
-              <p>Votre source d'information fiable et quotidienne. Retrouvez les meilleures actualités.</p>
+              <div className="font-serif font-bold text-xl tracking-tighter mb-2">Actu 24</div>
+              <p className="text-slate-600">L’information décryptée.<br />Indépendance • Rigueur • Transparence.</p>
             </div>
             <div>
-              <h5>Navigation</h5>
-              <ul>
+              <div className="font-semibold mb-2.5 text-slate-900">Navigation</div>
+              <ul className="space-y-1 text-slate-600">
                 <li><Link href="/">Accueil</Link></li>
-                <li><Link href="/articles">Articles</Link></li>
+                <li><Link href="/articles">Toute l’actualité</Link></li>
+                <li><Link href="/fact-check">Fact-checking</Link></li>
                 <li><Link href="/about">À propos</Link></li>
-                <li><Link href="#">Contact</Link></li>
               </ul>
             </div>
             <div>
-              <h5>Légal</h5>
-              <ul>
-                <li><Link href="#">Mentions légales</Link></li>
-                <li><Link href="#">Confidentialité</Link></li>
-                <li><Link href="#">Conditions d'utilisation</Link></li>
-                <li><Link href="#">Cookies</Link></li>
+              <div className="font-semibold mb-2.5 text-slate-900">Sections</div>
+              <ul className="space-y-1 text-slate-600">
+                <li>Politique</li>
+                <li>Économie</li>
+                <li>Société</li>
+                <li>International</li>
               </ul>
             </div>
             <div>
-              <h5>Contact</h5>
-              <p>📧 contact@actu24.fr</p>
-              <p>📱 +33 (0) 1 XX XX XX XX</p>
-              <p className="social">Facebook • Twitter • LinkedIn</p>
+              <div className="font-semibold mb-2.5 text-slate-900">Contact &amp; Légal</div>
+              <div className="text-slate-600 space-y-1">
+                <p>contact@actu24.fr</p>
+                <p className="text-xs mt-4">© {new Date().getFullYear()} Actu 24 — Tous droits réservés.</p>
+                <div className="text-[11px] text-slate-400 mt-1">Propulsé par Strapi &amp; Next.js</div>
+              </div>
             </div>
-          </div>
-          <div className="container copyright">
-            © 2026 Actu 24. Tous droits réservés. | Powered by Strapi & Next.js
           </div>
         </footer>
       </body>

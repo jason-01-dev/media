@@ -18,7 +18,7 @@ export async function generateStaticParams() {
   const articlesData = await getArticles();
   const articles = articlesData?.data || [];
   
-  return articles.map((article: any) => ({
+  return articles.map((article) => ({
     slug: article.slug,
   }));
 }
@@ -79,14 +79,13 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
 
   const allArticles = await getArticles({ pagination: { page: 1, pageSize: 20 } });
   
-  // Articles de la même catégorie (Connexes)
+  // Related and discovery (safe filtering)
   const relatedArticles = (allArticles?.data || [])
-    .filter((a: any) => a.id !== article.id && a.category?.id === article.category?.id)
+    .filter((a) => a.id !== article.id && a.category?.id === article.category?.id)
     .slice(0, 3);
   
-  // Autres thématiques pour la fin de page (Exclut l'article courant et les connexes)
   const moreArticles = (allArticles?.data || [])
-    .filter((a: any) => a.id !== article.id && !relatedArticles.some((r: any) => r.id === a.id))
+    .filter((a) => a.id !== article.id && !relatedArticles.some((r) => r.id === a.id))
     .slice(0, 3);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -183,17 +182,17 @@ export default async function ArticlePage({ params }: Readonly<Props>) {
             )}
             
             {article.blocks && article.blocks.length > 0 && (
-              <div className="additional-content-blocks">
+              <div className="additional-content-blocks space-y-8 mt-8">
                 {article.blocks.map((block: any, index: number) => {
                   const key = block.id ?? `${block.__component}-${index}`;
                   if (block.__component === "shared.rich-text" && block.body) {
-                    return <div key={key} className="rich-text-block" dangerouslySetInnerHTML={{ __html: block.body }} />;
+                    return <div key={key} className="prose max-w-none" dangerouslySetInnerHTML={{ __html: block.body }} />;
                   }
                   if (block.__component === "shared.quote") {
                     return (
-                      <blockquote key={key} className="styled-editorial-quote">
-                        <p>« {block.quote} »</p>
-                        {block.title && <cite>— {block.title}</cite>}
+                      <blockquote key={key} className="border-l-4 border-red-600 pl-6 py-1 italic text-[17px] leading-snug text-slate-800">
+                        « {block.quote || block.body} »
+                        {block.title && <cite className="block mt-2 not-italic font-medium text-sm text-slate-600">— {block.title}</cite>}
                       </blockquote>
                     );
                   }

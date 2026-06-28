@@ -8,27 +8,27 @@ import PaginationComponent from "@/components/PaginationComponent";
 import FeaturedSlider from "@/components/FeaturedSlider";
 import type { Metadata } from "next";
 
-// 6. CACHE & REVALIDATION (Mise à jour automatique toutes les 60 secondes pour les médias)
+// Dynamic because of searchParams + category filters
+export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 // 4. RÉFECTION DU SEO (Métadonnées complètes et professionnelles pour le site d'information)
 export const metadata: Metadata = {
-  title: "Actu 24 | Votre plateforme d'information et de décryptage en continu",
-  description: "Retrouvez toute l'actualité en direct, les analyses, les reportages exclusifs et les vérifications des faits (Fact-Checking) sur Actu 24.",
-  keywords: ["Actualité", "Information", "RDC", "Décryptage", "Fact-check", "Politique", "Économie", "Sport"],
+  title: "Actu 24 | L'Information Décryptée",
+  description: "Actualité en temps réel, analyses approfondies et vérification des faits rigoureuse. L'information de confiance.",
+  keywords: ["Actualité", "Information", "RDC", "Afrique", "Fact-check", "Politique", "Économie", "Décryptage"],
   authors: [{ name: "Rédaction Actu 24" }],
   openGraph: {
-    title: "Actu 24 | Votre plateforme d'information",
-    description: "Retrouvez toute l'actualité en direct, les analyses et les décryptages exclusifs sur Actu 24.",
+    title: "Actu 24 — L'Information Décryptée",
+    description: "Toute l'actualité, analyses et fact-checking de référence.",
     type: "website",
-    url: "/",
-    siteName: "Actu 24",
     locale: "fr_FR",
+    siteName: "Actu 24",
   },
   twitter: {
     card: "summary_large_image",
     title: "Actu 24 | L'Information Décryptée",
-    description: "Retrouvez toute l'actualité en direct et les analyses sur Actu 24.",
+    description: "Actualité, analyses et vérification des faits.",
   },
 };
 
@@ -58,7 +58,7 @@ export default async function Home({ searchParams }: PageProps) {
       filters.category = { slug: { $eq: categoryFilter } };
     }
 
-    // Chargement parallèle et stable des données initiales essentielles
+    // Parallel data fetching - main feed + categories + authors
     const [articlesData, categoriesData, authorsData] = await Promise.all([
       getArticles({
         pagination: { page, pageSize },
@@ -76,19 +76,19 @@ export default async function Home({ searchParams }: PageProps) {
     const total = (articlesData as any)?.meta?.pagination?.total || 0;
     const totalPages = Math.ceil(total / pageSize);
 
-    // 7. SÉCURISATION DU CONTENU VIDE (Découpage défensif des articles pour éviter les tableaux vides)
-    const featuredArticles = articles.slice(0, Math.min(articles.length, 5)); 
-    const topArticles = articles.length > 5 ? articles.slice(5, Math.min(articles.length, 8)) : [];      
-    const mainArticles = articles.length > 8 ? articles.slice(8) : [];       
+    // Smart slicing for sections (safe)
+    const featuredArticles = articles.slice(0, Math.min(articles.length, 5));
+    const topArticles = articles.length > 5 ? articles.slice(5, Math.min(articles.length, 8)) : [];
+    const mainArticles = articles.length > 8 ? articles.slice(8) : [];
 
-    // Récupération sécurisée et performante des articles par catégorie
-    // LE GROS BUG LOGIQUE CORRIGÉ : On fait maintenant des requêtes Strapi ciblées par catégorie en parallèle
+    // Better: fetch articles once with populate and group by category (avoids N+1)
+    // For simplicity and correctness we still do small targeted calls but limit them
     const categoriesWithArticles = await Promise.all(
-      categories.map(async (cat: any) => {
+      categories.slice(0, 6).map(async (cat: any) => {
         const catArticlesData = await getArticles({
           pagination: { page: 1, pageSize: 4 },
           sort: "publishedAt:desc",
-          filters: { category: { id: { $eq: cat.id } } },
+          filters: { category: { documentId: { $eq: cat.documentId } } }, // use documentId for stability
         });
         return {
           ...cat,
@@ -110,37 +110,31 @@ export default async function Home({ searchParams }: PageProps) {
       <div className="bg-slate-50 min-h-screen text-gray-900">
         <main className="max-w-7xl mx-auto px-4 md:px-6 py-8">
 
-          {/* HEADER ÉPURÉ */}
-          <div className="mb-10 border-b pb-6">
+          {/* HEADER ÉPURÉ + PRO */}
+          <div className="mb-10 border-b pb-7">
             {categories && categories.length > 0 && (
-              <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-xs font-bold uppercase tracking-widest text-red-600" aria-label="Filtres de catégories">
-                <div className="flex items-center">
-                  <Link href="/" className={`hover:text-slate-900 transition hover:underline ${!categoryFilter ? 'underline text-slate-900 font-black' : ''}`} aria-label="Afficher tous les articles">
-                    Tout
-                  </Link>
-                  <span className="ml-4 text-gray-300 font-normal select-none" aria-hidden="true">•</span>
-                </div>
-
+              <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 mb-4 text-xs font-semibold tracking-widest text-slate-600" aria-label="Filtres de catégories">
+                <Link href="/" className={`transition hover:text-slate-900 ${!categoryFilter ? 'text-slate-900 underline decoration-2 underline-offset-4' : 'hover:underline'}`}>
+                  Tout
+                </Link>
                 {categories.map((cat: any, index: number) => (
-                  <div key={cat.id || index} className="flex items-center">
+                  <span key={cat.id || index} className="flex items-center gap-5">
+                    <span className="text-slate-300 select-none">•</span>
                     <Link 
                       href={`/?category=${cat.slug}`} 
-                      className={`hover:text-slate-900 transition hover:underline ${categoryFilter === cat.slug ? 'underline text-slate-900 font-black' : ''}`}
-                      aria-label={`Filtrer par catégorie ${cat.name}`}
+                      className={`transition hover:text-slate-900 ${categoryFilter === cat.slug ? 'text-slate-900 underline decoration-2 underline-offset-4' : 'hover:underline'}`}
                     >
                       {cat.name}
                     </Link>
-                    {index < categories.length - 1 && (
-                      <span className="ml-4 text-gray-300 font-normal select-none" aria-hidden="true">•</span>
-                    )}
-                  </div>
+                  </span>
                 ))}
               </nav>
             )}
 
-            <h1 className="text-4xl md:text-5xl font-black font-serif">
-              L'Information Décryptée
+            <h1 className="text-5xl md:text-[56px] font-semibold tracking-[-1.8px] font-serif leading-none text-slate-950">
+              L’Information Décryptée
             </h1>
+            <p className="mt-3 text-slate-600 max-w-md">Analyses, reportages et vérifications en temps réel.</p>
           </div>
 
           <AdvancedSearchBar categories={categories} authors={authors} />
@@ -161,66 +155,59 @@ export default async function Home({ searchParams }: PageProps) {
             </section>
           )}
 
-          {/* TOP ARTICLES */}
+          {/* TOP ARTICLES - Pro cards */}
           {topArticles.length > 0 && (
-            <section className="grid md:grid-cols-3 gap-6 mb-12" aria-label="Articles mis en avant">
-              {topArticles.map((article) => (
-                <Link key={article.id} href={`/articles/${article.slug}`} aria-label={`Lire l'article : ${article.title}`}>
-                  <div className="group bg-white p-3 rounded-xl border border-gray-100 shadow-sm h-full transition hover:shadow-md">
-                    <div className="relative h-44 mb-3 overflow-hidden rounded-lg bg-gray-100">
-                      {getImage(article) && (
-                        <Image
-                          src={getImage(article)}
-                          alt={article.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition duration-300"
-                        />
-                      )}
+            <section className="mb-12" aria-label="Articles mis en avant">
+              <div className="grid md:grid-cols-3 gap-5">
+                {topArticles.map((article) => (
+                  <Link key={article.id} href={`/articles/${article.slug}`} className="group block">
+                    <div className="h-full overflow-hidden rounded-2xl border border-slate-100 bg-white transition hover:border-slate-200 hover:shadow-lg">
+                      <div className="relative aspect-[16/9] bg-slate-100">
+                        {getImage(article) && (
+                          <Image
+                            src={getImage(article)}
+                            alt={article.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40" />
+                      </div>
+                      <div className="p-4">
+                        <div className="text-[10px] uppercase tracking-[1.5px] font-semibold text-red-600">{getCategoryLabel(article)}</div>
+                        <h3 className="mt-1.5 text-[15px] leading-snug font-semibold tracking-[-0.2px] group-hover:text-red-600 line-clamp-3 transition">
+                          {article.title}
+                        </h3>
+                      </div>
                     </div>
-
-                    <span className="text-xs text-red-600 uppercase font-semibold tracking-wide">
-                      {getCategoryLabel(article)}
-                    </span>
-
-                    <h3 className="font-bold mt-1 group-hover:text-red-600 line-clamp-2 text-base transition">
-                      {article.title}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
             </section>
           )}
 
-          {/* SECTION FACT-CHECK STYLE FIL D'ACTUALITÉ / STREAMING */}
-<section className="w-screen relative left-1/2 right-1/2 -mx-[50vw] bg-slate-900 text-white py-12 mb-14 border-y border-slate-800" aria-label="Zone de vérification des faits en direct">
-  <div className="max-w-7xl mx-auto px-4 md:px-6">
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-800 pb-4">
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-          <span className="text-xs font-bold uppercase tracking-widest text-red-400">
-            Fact-Checking en direct
-          </span>
-        </div>
-        <h2 className="text-2xl font-black font-serif mt-1 text-white">
-          Le Vrai du Faux
-        </h2>
-      </div>
-      
-      <Link 
-        href="/fact-check" 
-        className="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl transition-all duration-200 no-underline"
-      >
-        Voir tout le flux →
-      </Link>
-    </div>
+          {/* PREMIUM FACT-CHECK SECTION - Clean & Professional */}
+          <section className="my-14 rounded-2xl bg-slate-950 text-white overflow-hidden" aria-label="Vérification des faits">
+            <div className="max-w-7xl mx-auto px-6 py-12">
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+                <div>
+                  <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-[2px] text-red-400 mb-3">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" /> EN TEMPS RÉEL
+                  </div>
+                  <h2 className="font-serif text-4xl font-black tracking-tighter">Le Vrai du Faux</h2>
+                  <p className="mt-2 max-w-md text-slate-400 text-[15px]">Vérifications rigoureuses des affirmations qui circulent.</p>
+                </div>
+                <Link 
+                  href="/fact-check" 
+                  className="inline-flex items-center gap-2 self-start rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-950 hover:bg-red-500 hover:text-white transition-colors"
+                >
+                  Consulter toutes les vérifications <span aria-hidden>→</span>
+                </Link>
+              </div>
 
-    {/* Conteneur fluide et sécurisé pour le streaming de fact-checks */}
-    <div className="fact-check-streaming-container grid gap-4">
-      <FactCheckPreview />
-    </div>
-  </div>
-</section>
+              <FactCheckPreview />
+            </div>
+          </section>
 
           {/* MAIN FEED (FLUX CONTINU) */}
           {mainArticles.length > 0 && (
@@ -229,36 +216,30 @@ export default async function Home({ searchParams }: PageProps) {
                 Flux d’actualité
               </h2>
 
-              <div className="space-y-8">
+              <div className="divide-y divide-slate-100">
                 {mainArticles.map((article) => (
-                  <Link key={article.id} href={`/articles/${article.slug}`} aria-label={`Lire l'article : ${article.title}`}>
-                    <div className="flex gap-6 border-b pb-6 group hover:bg-gray-50/50 p-2 rounded-lg transition">
-                      
-                      <div className="w-1/3 relative h-32 md:h-36 overflow-hidden rounded-lg bg-gray-100 flex-shrink-0">
+                  <Link key={article.id} href={`/articles/${article.slug}`} className="group block py-6 first:pt-0 last:pb-0">
+                    <div className="flex flex-col md:flex-row gap-6">
+                      <div className="md:w-2/5 relative aspect-video md:aspect-[16/10] overflow-hidden rounded-xl bg-slate-100 flex-shrink-0">
                         {getImage(article) && (
                           <Image
                             src={getImage(article)}
                             alt={article.title}
                             fill
-                            className="object-cover group-hover:scale-105 transition duration-300"
+                            className="object-cover transition duration-500 group-hover:scale-[1.035]"
                           />
                         )}
                       </div>
 
-                      <div className="w-2/3 flex flex-col justify-center">
-                        <span className="text-xs text-red-600 uppercase font-semibold tracking-wide">
-                          {getCategoryLabel(article)}
-                        </span>
-
-                        <h3 className="text-lg font-bold mt-1 group-hover:text-red-600 transition line-clamp-2">
+                      <div className="flex-1 pt-1">
+                        <span className="text-[10px] font-black tracking-[1.5px] uppercase text-red-600">{getCategoryLabel(article)}</span>
+                        <h3 className="mt-1.5 font-serif text-[20px] leading-[1.15] font-semibold tracking-tight group-hover:text-red-700 transition line-clamp-3">
                           {article.title}
                         </h3>
-
-                        <p className="text-gray-600 mt-2 line-clamp-2 text-sm hidden md:block">
-                          {getExcerpt(article)}
-                        </p>
+                        {getExcerpt(article) && (
+                          <p className="mt-3 text-[14px] text-slate-600 line-clamp-2">{getExcerpt(article)}</p>
+                        )}
                       </div>
-
                     </div>
                   </Link>
                 ))}
@@ -273,35 +254,29 @@ export default async function Home({ searchParams }: PageProps) {
 
               return (
                 <div key={cat.id} className="border-t pt-8 first:border-0 first:pt-0">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-2xl font-bold font-serif uppercase tracking-tight text-slate-800 border-l-4 border-red-600 pl-3">
+                  <div className="flex justify-between items-baseline mb-5">
+                    <h3 className="text-xl font-semibold tracking-tight text-slate-900 flex items-center gap-3">
+                      <span className="inline-block h-[3px] w-7 bg-red-600 align-middle" />
                       {cat.name}
                     </h3>
-                    <Link href={`/?category=${cat.slug}`} className="text-sm font-semibold text-red-600 hover:underline" aria-label={`Voir plus d'articles de la catégorie ${cat.name}`}>
-                      Voir plus →
-                    </Link>
+                    <Link href={`/?category=${cat.slug}`} className="text-xs uppercase tracking-widest font-bold text-red-600 hover:text-red-700 transition">Voir tout →</Link>
                   </div>
 
-                  <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
                     {cat.articles.map((article: Article) => (
-                      <Link key={article.id} href={`/articles/${article.slug}`} aria-label={`Lire l'article : ${article.title}`}>
-                        <div className="group flex flex-col h-full bg-white border rounded-xl p-3 shadow-sm transition hover:shadow-md">
-                          <div className="relative h-36 mb-3 overflow-hidden rounded-lg bg-gray-100">
+                      <Link key={article.id} href={`/articles/${article.slug}`} className="group block">
+                        <div className="h-full flex flex-col rounded-2xl border border-slate-100 bg-white overflow-hidden transition hover:border-slate-300 hover:shadow-md">
+                          <div className="relative aspect-[16/9] bg-slate-100">
                             {getImage(article) && (
-                              <Image
-                                src={getImage(article)}
-                                alt={article.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition duration-300"
-                              />
+                              <Image src={getImage(article)} alt={article.title} fill className="object-cover transition-transform group-hover:scale-105" />
                             )}
                           </div>
-                          <span className="text-[11px] text-red-600 uppercase font-bold tracking-wide mb-1">
-                            {getCategoryLabel(article)}
-                          </span>
-                          <h4 className="text-sm font-bold text-gray-900 line-clamp-2 group-hover:text-red-600 transition mt-auto">
-                            {article.title}
-                          </h4>
+                          <div className="flex-1 p-4 flex flex-col">
+                            <span className="text-[10px] font-bold tracking-[1.2px] uppercase text-red-600">{cat.name}</span>
+                            <h4 className="mt-2 font-semibold text-[15px] leading-tight tracking-tight line-clamp-3 group-hover:text-red-700 transition">
+                              {article.title}
+                            </h4>
+                          </div>
                         </div>
                       </Link>
                     ))}

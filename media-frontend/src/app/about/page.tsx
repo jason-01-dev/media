@@ -1,8 +1,8 @@
 import { getAbout } from "@/lib/strapi";
 
 export const metadata = {
-  title: "About Us",
-  description: "Learn more about us",
+  title: "À propos",
+  description: "Découvrez Actu 24, notre mission et notre engagement pour une information rigoureuse et indépendante.",
 };
 
 export default async function AboutPage() {
@@ -21,28 +21,19 @@ export default async function AboutPage() {
       </h1>
 
       {about?.blocks && about.blocks.length > 0 ? (
-        <div className="prose dark:prose-invert max-w-none space-y-6">
+        <div className="prose prose-slate max-w-[68ch] text-[15px]">
           {about.blocks.map((block: any, index: number) => {
             const key = block.id ?? `${block.__component}-${index}`;
             if (block.__component === "shared.rich-text") {
               return (
-                <div
-                  key={key}
-                  className="text-zinc-700 dark:text-zinc-300 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: block.body }}
-                />
+                <div key={key} dangerouslySetInnerHTML={{ __html: block.body }} />
               );
             }
             if (block.__component === "shared.quote") {
               return (
-                <blockquote
-                  key={key}
-                  className="border-l-4 border-black dark:border-white pl-6 py-4 italic text-lg text-zinc-700 dark:text-zinc-300"
-                >
-                  <p>{block.body}</p>
-                  <p className="mt-2 font-medium text-zinc-900 dark:text-white">
-                    — {block.title}
-                  </p>
+                <blockquote key={key} className="border-l-[5px] border-slate-900 pl-6 text-xl leading-tight not-italic">
+                  {block.body || block.quote}
+                  {block.title && <cite className="block mt-3 text-base font-medium not-italic text-slate-600">— {block.title}</cite>}
                 </blockquote>
               );
             }
@@ -50,9 +41,10 @@ export default async function AboutPage() {
           })}
         </div>
       ) : (
-        <p className="text-zinc-600 dark:text-zinc-400 text-lg">
-          No content available yet.
-        </p>
+        <div className="max-w-prose text-lg text-slate-600">
+          Actu 24 est une plateforme indépendante dédiée à l’information de qualité et à la vérification des faits. 
+          Notre mission : décrypter l’actualité avec rigueur et transparence.
+        </div>
       )}
     </div>
   );

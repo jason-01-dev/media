@@ -24,7 +24,6 @@ export default function Header({ categories = [] }: Readonly<HeaderProps>) {
     weekday: "long",
     day: "numeric",
     month: "long",
-    year: "numeric",
   });
 
   return (
@@ -33,7 +32,7 @@ export default function Header({ categories = [] }: Readonly<HeaderProps>) {
         <Link
           href="/"
           className="site-logo"
-          aria-label="Actu24 - Page d'accueil"
+          aria-label="Actu 24 - Accueil"
         >
           <span className="logo-mark" aria-hidden="true">
             <FaBroadcastTower className="logo-broadcast-icon" />
@@ -43,7 +42,7 @@ export default function Header({ categories = [] }: Readonly<HeaderProps>) {
 
         <nav className="top-links" aria-label="Navigation principale">
           {MENU_ITEMS.map((item) => (
-            <Link key={item.label} href={item.href} title={item.label}>
+            <Link key={item.label} href={item.href}>
               {item.label}
             </Link>
           ))}

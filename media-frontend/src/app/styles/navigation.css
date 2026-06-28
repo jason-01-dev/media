@@ -16,14 +16,13 @@
 
 .top-links a {
   text-decoration: none;
-  color: #f8f8f8;
-  font-weight: 700;
-  font-size: 13px;
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 12.5px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  transition: color var(--transition-base), border-color var(--transition-base);
-  border-bottom: 2px solid transparent;
-  padding-bottom: 4px;
+  letter-spacing: 0.07em;
+  transition: color var(--transition-base);
+  padding-bottom: 3px;
   position: relative;
 }
 
@@ -40,24 +39,11 @@
 
 .top-links a:hover,
 .top-links a:focus-visible {
-  color: #ffffff;
-}
-
-.top-links a:hover::after,
-.top-links a:focus-visible::after {
-  background: #FFD700;
-}
-
-.top-links a.active,
-.top-links a.active::after {
-  color: #FFD700;
-  background: #FFD700;
-}
-
-.top-links a:hover,
-.top-links a:focus-visible {
   color: #fff;
-  border-bottom-color: #FFD700;
+}
+
+.top-links a.active {
+  color: #facc15;
 }
 
 .top-links a:focus-visible {

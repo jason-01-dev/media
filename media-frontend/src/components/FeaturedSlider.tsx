@@ -36,51 +36,53 @@ export default function FeaturedSlider({ featuredArticles }: FeaturedSliderProps
   const current = featuredArticles[currentIndex];
 
   return (
-    <Link href={`/articles/${current.slug}`} className="block">
-      <div className="relative h-[420px] rounded-xl overflow-hidden group shadow-sm bg-gray-200 transition-all duration-500">
+    <Link href={`/articles/${current.slug}`} className="block group">
+      <div className="relative h-[460px] md:h-[480px] rounded-3xl overflow-hidden shadow-xl bg-slate-900 transition-all duration-500">
         
-        {/* Affichage sécurisé de l'image */}
         {current.coverUrl && (
           <Image
             src={current.coverUrl}
             alt={current.title}
             fill
-            className="object-cover group-hover:scale-105 transition duration-300"
+            className="object-cover transition duration-700 group-hover:scale-[1.03]"
             priority
+            sizes="(max-width: 768px) 100vw, 1200px"
           />
         )}
 
-        {/* Dégradé pour lisibilité */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        {/* Elegant gradient + subtle vignette */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(#fff_0.6px,transparent_1px)] bg-[length:4px_4px] opacity-[0.035]" />
 
-        {/* Textes de l'article */}
-        <div className="absolute bottom-0 p-6 text-white max-w-3xl z-10">
-          <span className="text-xs bg-red-600 px-2 py-1 uppercase font-bold tracking-wider rounded-sm">
-            {current.categoryLabel}
-          </span>
+        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10 text-white">
+          <div className="max-w-3xl">
+            <span className="inline-block rounded bg-red-600 px-3 py-px text-[10px] font-bold tracking-[1.5px] uppercase mb-4">
+              {current.categoryLabel}
+            </span>
 
-          <h2 className="text-3xl md:text-4xl font-bold mt-3 leading-tight">
-            {current.title}
-          </h2>
+            <h2 className="font-serif text-3xl md:text-[42px] leading-[1.05] font-semibold tracking-tighter">
+              {current.title}
+            </h2>
 
-          <p className="mt-2 text-gray-200 line-clamp-2 text-sm md:text-base">
-            {current.excerpt}
-          </p>
+            {current.excerpt && (
+              <p className="mt-4 max-w-2xl text-lg text-white/80 line-clamp-2">
+                {current.excerpt}
+              </p>
+            )}
+          </div>
         </div>
         
-        {/* Boutons de navigation (petits points en bas à droite) */}
+        {/* Refined dots */}
         {featuredArticles.length > 1 && (
           <div 
-            className="absolute right-6 bottom-6 flex gap-2 z-20" 
-            onClick={(e) => e.preventDefault()} // Évite de déclencher le lien au clic sur un point
+            className="absolute right-8 bottom-8 flex gap-2 z-20" 
+            onClick={(e) => e.preventDefault()}
           >
             {featuredArticles.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
-                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  idx === currentIndex ? 'bg-red-600 w-6' : 'bg-white/50 hover:bg-white'
-                }`}
+                className={`h-1.5 rounded-full transition-all duration-200 ${idx === currentIndex ? 'w-8 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/80'}`}
                 aria-label={`Aller à l'article ${idx + 1}`}
               />
             ))}
