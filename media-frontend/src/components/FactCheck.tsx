@@ -21,27 +21,9 @@ interface Claim {
 }
 
 function getFactCheckVerdictLabel(verdict: Claim['verdict']) {
-  if (verdict === 'verified') {
-    return 'Vérifié';
-  }
-
-  if (verdict === 'disputed') {
-    return 'Contesté';
-  }
-
+  if (verdict === 'verified') return 'Vérifié';
+  if (verdict === 'disputed') return 'Contesté';
   return 'Faux';
-}
-
-function getFactCheckVerdictTitle(verdict: Claim['verdict']) {
-  if (verdict === 'verified') {
-    return '✔️ Vérifié';
-  }
-
-  if (verdict === 'disputed') {
-    return '⚠️ Contesté';
-  }
-
-  return '❌ Faux';
 }
 
 function buildMediaUrl(mediaData: any, baseUrl: string) {
@@ -73,68 +55,69 @@ function mapFactCheckItem(d: any, baseUrl: string): Claim {
   };
 }
 
-const FALLBACK: Claim[] = [
-  { id: 1, claim: "Le vaccin X cause l'infertilité", verdict: "false", source: "WHO" },
-  { id: 2, claim: "Le projet Y est financé par des fonds publics", verdict: "verified", source: "Rapport officiel" },
-  { id: 3, claim: "Une vidéo montre une fraude massive", verdict: "disputed", source: "Analyse indépendante" },
-];
-
 export default function FactCheck() {
   const pathname = usePathname();
   const isFactCheckPage = pathname === '/fact-check';
   const [query, setQuery] = useState("");
-  const [claims, setClaims] = useState<Claim[]>(FALLBACK);
+  const [claims, setClaims] = useState<Claim[]>([]); // Initialisé vide, plus de fallback statique
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [baseUrl, setBaseUrl] = useState<string>('http://localhost:1337');
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Indicateur de chargement pour l'API
 
-  // Mark as hydrated on client-side
+  // 1. Gestion de l'hydratation et calcul de la bonne URL
   useEffect(() => {
     setIsHydrated(true);
+
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname;
+      const protocol = window.location.protocol;
+
+      if (host !== 'localhost' && host !== '127.0.0.1') {
+        // En prod, on retire le port 1337 par défaut
+        setBaseUrl(`${protocol}//${host}`);
+      }
+    }
   }, []);
 
-  // Determine base URL only on client-side after hydration
+  // 2. Appel de l'API Strapi
   useEffect(() => {
     if (!isHydrated) return;
-    if (typeof globalThis === 'undefined') return;
 
-    const location = (globalThis as any).location;
-    if (!location?.hostname) return;
-
-    const host = location.hostname;
-    const protocol = location.protocol || 'http:';
-
-    if (host !== 'localhost' && host !== '127.0.0.1') {
-      setBaseUrl(`${protocol}//${host}:1337`);
-    }
-  }, [isHydrated]);
-
-  useEffect(() => {
     let mounted = true;
-    (async () => {
-      const res = await getFactChecks();
-      if (!mounted) return;
-      
-      if (res && Array.isArray((res as any).data)) {
-        const items = (res as any).data.map((d: any) => mapFactCheckItem(d, baseUrl));
-        setClaims(items.length ? items : FALLBACK);
-      } else {
-        setClaims(FALLBACK);
+    
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const res = await getFactChecks();
+        if (!mounted) return;
+        
+        if (res && Array.isArray((res as any).data)) {
+          const items = (res as any).data.map((d: any) => mapFactCheckItem(d, baseUrl));
+          setClaims(items);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des données Strapi:", error);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
-    })();
+    };
+
+    fetchData();
+    
     return () => { mounted = false; };
-  }, [baseUrl]);
+  }, [isHydrated, baseUrl]); 
 
   const filtered = claims.filter((c) => c.claim.toLowerCase().includes(query.toLowerCase()));
 
-  // Don't render until hydrated to avoid Chrome extension mismatches
+  // Écran d'attente de sécurité pour l'hydratation côté client
   if (!isHydrated) {
     return (
       <section className="factcheck-section" aria-labelledby="factcheck-title" suppressHydrationWarning>
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
           <div className="factcheck-header">
             <h2 id="factcheck-title">Section Fact-Check</h2>
-            <p className="muted">Chargement...</p>
+            <p className="muted">Chargement de la section...</p>
           </div>
         </div>
       </section>
@@ -156,6 +139,7 @@ export default function FactCheck() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="search-input"
+            disabled={isLoading}
           />
           {!isFactCheckPage && (
             <Link href="/fact-check" className="btn-primary" style={{ marginLeft: 12 }}>
@@ -164,34 +148,41 @@ export default function FactCheck() {
           )}
         </div>
 
+        {/* Affichage des fiches, de l'état de chargement ou d'une liste vide */}
         <div className="factcheck-list" style={{ marginTop: 20 }}>
-          {filtered.map((c) => (
-            <article key={c.id} className={`factcard verdict-${c.verdict}`}>
-              <div className="factcard-body">
-                <button
-                  type="button"
-                  onClick={() => setSelectedClaim(c)}
-                  style={{
-                    cursor: 'pointer',
-                    color: '#0066cc',
-                    textDecoration: 'underline',
-                    border: 'none',
-                    background: 'none',
-                    padding: 0,
-                    font: 'inherit',
-                    textAlign: 'left',
-                  }}
-                >
-                  {c.claim}
-                </button>
-              </div>
-              <div className="factcard-verdict">{getFactCheckVerdictLabel(c.verdict)}</div>
-            </article>
-          ))}
+          {isLoading ? (
+            <p className="muted">Récupération des vérifications depuis Strapi...</p>
+          ) : filtered.length > 0 ? (
+            filtered.map((c) => (
+              <article key={c.id} className={`factcard verdict-${c.verdict}`}>
+                <div className="factcard-body">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedClaim(c)}
+                    style={{
+                      cursor: 'pointer',
+                      color: '#0066cc',
+                      textDecoration: 'underline',
+                      border: 'none',
+                      background: 'none',
+                      padding: 0,
+                      font: 'inherit',
+                      textAlign: 'left',
+                    }}
+                  >
+                    {c.claim}
+                  </button>
+                </div>
+                <div className="factcard-verdict">{getFactCheckVerdictLabel(c.verdict)}</div>
+              </article>
+            ))
+          ) : (
+            <p className="muted">Aucune vérification disponible pour le moment.</p>
+          )}
         </div>
       </div>
 
-      {/* Modal pour détails (disposition originale) */}
+      {/* Modal pour détails */}
       {selectedClaim && (
         <div style={{
           position: 'fixed',
